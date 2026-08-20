@@ -40,12 +40,16 @@ merged beats a feature at 100% still sitting on your laptop.
 - **Backend**: Vercel serverless functions under `/api`. One function so
   far: `api/analyze.js`. `POST /api/analyze` is the *only* endpoint the
   frontend calls — never add a new fetch target without a very good reason.
-- **Local dev, two modes**:
+- **Local dev, three modes**:
   - `npm run dev` — Vite only. No `/api`, so every request falls back to
     mock data. Good for pure UI work, needs no API keys.
-  - `npm run dev:full` (= `vercel dev`, needs `npm i -g vercel` once) —
-    runs the real frontend *and* `/api` together on one port, reading
-    secrets from `.env.local`. Use this to test a real transform.
+  - `npm run dev:local` — runs `scripts/dev-server.js` (real
+    `api/analyze.js`, plain Node, no Vercel account) alongside Vite, joined
+    by the `/api` proxy in `vite.config.js`. Reads secrets from
+    `.env.local`. Easiest way to test a real transform.
+  - `npm run dev:full` (= `vercel dev`, needs a one-time Vercel CLI login)
+    — highest-fidelity match to the deployed runtime, use if you need to
+    reproduce a Vercel-specific issue.
 - **Env vars** (put in `.env.local`, never commit it — see `.env.example`):
   - `GEMINI_API_KEY` — required for any real AI call. Free, no card, at
     https://aistudio.google.com/apikey

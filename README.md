@@ -52,7 +52,9 @@ npm install
 cp .env.example .env.local   # add your GEMINI_API_KEY
 npm run dev                  # UI only, mock data, no keys needed
 # or
-npm run dev:full             # full stack (needs `npm i -g vercel` once)
+npm run dev:local            # full stack, no Vercel account needed
+# or
+npm run dev:full             # full stack via `vercel dev` (needs a Vercel login)
 ```
 
 Get a free Gemini key at https://aistudio.google.com/apikey — no credit
@@ -107,3 +109,7 @@ there rather than hardcoding a color or spacing value.
   transforms are wired up (see `docs/FEATURES.md`).
 - Google Fonts (Inter) requires normal internet access to load — it won't
   render in network-restricted sandboxes, only real browsers/deployments.
+- `GEMINI_MODEL` defaults to `gemini-3.6-flash` (see `lib/gemini.js`) —
+  `gemini-2.5-flash`, the old default, has been retired for new API keys.
+  If you have `GEMINI_MODEL` pinned in your own `.env.local`, make sure
+  it's a currently-available model or unset it to use the default.
