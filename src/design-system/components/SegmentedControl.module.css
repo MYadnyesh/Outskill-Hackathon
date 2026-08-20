@@ -1,0 +1,26 @@
+.track {
+  display: inline-flex;
+  padding: var(--space-1);
+  border-radius: var(--radius);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  gap: var(--space-1);
+}
+
+.option {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-body-sm);
+  font-weight: var(--fw-medium);
+  color: var(--text-secondary);
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.option:hover {
+  color: var(--text-primary);
+}
+
+.optionActive {
+  background: var(--accent-tint);
+  color: var(--accent-text-strong);
+}

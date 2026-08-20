@@ -1,0 +1,52 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: flex-start;
+  text-align: left;
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+  width: 100%;
+}
+
+.card:hover {
+  border-color: var(--border-strong);
+}
+
+.selected {
+  border-color: var(--accent);
+  background: var(--accent-tint);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.iconEmoji {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.check {
+  color: var(--accent-text-strong);
+  flex: none;
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-weight: var(--fw-medium);
+  font-size: var(--fs-body-lg);
+  color: var(--text-primary);
+}
+
+.desc {
+  font-size: var(--fs-body-sm);
+  color: var(--text-secondary);
+  line-height: var(--lh-snug);
+}

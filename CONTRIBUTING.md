@@ -1,0 +1,96 @@
+# Contributing to Prism
+
+Team project for the Outskill Hackathon. Deadline: **Aug 21**. This doc is
+the git/PR workflow; `docs/FEATURES.md` is what to actually build.
+
+## One-time setup
+
+```bash
+git clone https://github.com/MYadnyesh/Outskill-Hackathon.git
+cd Outskill-Hackathon
+npm install
+cp .env.example .env.local   # then fill in your keys, see below
+```
+
+Get a free Gemini key (no credit card) at https://aistudio.google.com/apikey
+and put it in `.env.local` as `GEMINI_API_KEY`. `.env.local` is gitignored —
+never commit real keys.
+
+## Running it locally
+
+Two ways, pick based on what you're working on:
+
+- **UI-only work** (styling, layout, a new screen that doesn't need a real
+  API response yet): `npm run dev`. Plain Vite, no backend — every request
+  automatically falls back to the bundled demo data (see
+  `src/mock/demoData.js`), so you don't need any keys at all.
+- **Backend or full end-to-end work**: `npm run dev:full` (runs
+  `vercel dev`). First time, install the CLI: `npm i -g vercel`. This runs
+  the real frontend *and* the `/api` serverless functions together, reading
+  secrets from `.env.local`. This is what actually calls Gemini.
+
+Before opening a PR that touches `/api` or `/lib`, run:
+```bash
+npm run test:api       # smoke-tests api/analyze.js directly, no CLI needed
+node scripts/test-extract.js   # unit test for HTML parsing, no network needed
+npm run build           # make sure the production build doesn't break
+```
+
+## Branches
+
+- `main` is the deployed branch — every push to `main` auto-deploys on
+  Vercel once it's connected (see README for the one-time Vercel import
+  step). Don't push straight to `main`.
+- Branch per feature, off `main`:
+  ```bash
+  git checkout main && git pull
+  git checkout -b feature/<short-name>
+  ```
+  Suggested names matching `docs/FEATURES.md`'s sections:
+  `feature/song-mode`, `feature/kid-mode`, `feature/library-polish`,
+  `feature/backend-reliability`, `feature/design-qa`. Claim one by pushing
+  to it / opening a draft PR early, so it's obvious to the rest of the team
+  what's taken — this repo doesn't have a separate task board, the branch
+  list *is* the task board.
+- If two features genuinely need the same file (most likely
+  `api/analyze.js` and `src/screens/Results.jsx` — see "ground rules" at
+  the bottom of `docs/FEATURES.md`), keep your change there small and
+  additive to minimize merge pain.
+
+## Commits
+
+Plain, present-tense, specific. No strict convention enforced, but roughly:
+
+```
+add song lyrics transform + gemini prompt
+wire elevenlabs music client with null-audio fallback
+fix quiz options not locking after first answer
+```
+
+Small, frequent commits beat one giant commit at the end — easier for
+everyone else to see what's landed.
+
+## Pull requests
+
+1. Push your branch, open a PR into `main`.
+2. Vercel will comment on the PR with a preview deployment link once the
+   repo's connected (ask whoever set up Vercel if you don't see one) — use
+   it to sanity-check on a real deployed URL, not just localhost.
+3. One other person reviews before merge if you can get someone — for a
+   hackathon deadline, a quick "looks reasonable, doesn't break the build"
+   is enough, this isn't a production review bar.
+4. Squash or regular merge, either's fine. Delete the branch after merge.
+
+## If something's broken and you don't know why
+
+- Check `docs/FEATURES.md` first — it documents the exact contract every
+  piece assumes (`POST /api/analyze`'s request/response shape). A lot of
+  "why is this undefined" bugs come from a response shape drifting.
+  If your response payload for reference: `demoTldr` / `demoSong` /
+  `demoKid` in `src/mock/demoData.js` is the shape to match.
+- If Gemini calls are failing, first check `.env.local` has
+  `GEMINI_API_KEY` set and `npm run dev:full` (not plain `npm run dev`) is
+  what's running — plain Vite never reaches the real API.
+- Ping the group chat rather than sitting stuck for more than ~20 minutes
+  — the deadline's tight enough that unblocking each other fast matters
+  more than everyone independently debugging the same class of issue.
