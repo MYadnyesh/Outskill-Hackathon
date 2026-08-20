@@ -18,16 +18,21 @@ never commit real keys.
 
 ## Running it locally
 
-Two ways, pick based on what you're working on:
+Three ways, pick based on what you're working on:
 
 - **UI-only work** (styling, layout, a new screen that doesn't need a real
   API response yet): `npm run dev`. Plain Vite, no backend — every request
   automatically falls back to the bundled demo data (see
   `src/mock/demoData.js`), so you don't need any keys at all.
-- **Backend or full end-to-end work**: `npm run dev:full` (runs
-  `vercel dev`). First time, install the CLI: `npm i -g vercel`. This runs
-  the real frontend *and* the `/api` serverless functions together, reading
-  secrets from `.env.local`. This is what actually calls Gemini.
+- **Backend or full end-to-end work, no Vercel account**: `npm run dev:local`.
+  Runs `scripts/dev-server.js` (a plain Node server that executes
+  `api/analyze.js` directly) alongside Vite, wired together by the `/api`
+  proxy in `vite.config.js`. Reads secrets from `.env.local`, no CLI login
+  required — this is the easiest way to hit real Gemini locally.
+- **Full end-to-end work with Vercel-exact behavior**: `npm run dev:full`
+  (runs `vercel dev`). First time, this walks you through logging into a
+  Vercel account via the CLI. Prefer `dev:local` unless you specifically
+  need to reproduce Vercel's own runtime.
 
 Before opening a PR that touches `/api` or `/lib`, run:
 ```bash
@@ -89,8 +94,18 @@ everyone else to see what's landed.
   If your response payload for reference: `demoTldr` / `demoSong` /
   `demoKid` in `src/mock/demoData.js` is the shape to match.
 - If Gemini calls are failing, first check `.env.local` has
-  `GEMINI_API_KEY` set and `npm run dev:full` (not plain `npm run dev`) is
-  what's running — plain Vite never reaches the real API.
+  `GEMINI_API_KEY` set and `npm run dev:local` or `npm run dev:full` (not
+  plain `npm run dev`) is what's running — plain Vite never reaches the
+  real API.
+- If Gemini errors with a 404 on the model name, or with "malformed JSON"
+  on real (non-trivial) pages: `lib/gemini.js`'s default model has already
+  been bumped once (`gemini-2.5-flash` → `gemini-3.6-flash`, the old one
+  was retired for new API keys) and its `thinkingConfig.thinkingBudget` is
+  capped at `512` because uncapped thinking on the newer model can burn the
+  whole `maxOutputTokens` budget on reasoning before writing any JSON,
+  truncating the response. If this recurs on a future model swap, check
+  `finishReason` / `usageMetadata.thoughtsTokenCount` in the raw Gemini
+  response before assuming your own code broke it.
 - Ping the group chat rather than sitting stuck for more than ~20 minutes
   — the deadline's tight enough that unblocking each other fast matters
   more than everyone independently debugging the same class of issue.
