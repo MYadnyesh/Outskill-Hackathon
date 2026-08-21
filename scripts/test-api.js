@@ -4,9 +4,14 @@
 // useful in restricted sandboxes/CI. It calls the handler directly with
 // fake (req, res) objects. Run with: npm run test:api
 //
-// If GEMINI_API_KEY isn't set, the 'tldr' case is expected to fail with
-// AI_ERROR — that's a PASS for this script (it proves error handling works),
-// not a real failure. Set GEMINI_API_KEY in your shell to test the real path.
+// If GEMINI_API_KEY isn't set, the 'tldr' and 'song' cases are expected to
+// fail with AI_ERROR — that's a PASS for this script (it proves error handling
+// works), not a real failure. Set GEMINI_API_KEY in your shell to test the
+// real path.
+//
+// Song mode's audio is separate: with a GEMINI_API_KEY but no
+// ELEVENLABS_API_KEY, song mode should still return 200 with full lyrics and
+// `audioUrl: null` — audio is best-effort and must never fail the request.
 
 import handler from '../api/analyze.js';
 
@@ -46,7 +51,7 @@ async function run(label, body) {
 
 const cases = [
   ['TL;DR on a real page', { url: 'https://en.wikipedia.org/wiki/Black_hole', mode: 'tldr' }],
-  ['song mode (not implemented stub)', { url: 'https://en.wikipedia.org/wiki/Black_hole', mode: 'song' }],
+  ['song mode (lyrics; audio best-effort)', { url: 'https://en.wikipedia.org/wiki/Black_hole', mode: 'song' }],
   ['kid mode (not implemented stub)', { url: 'https://en.wikipedia.org/wiki/Black_hole', mode: 'kid' }],
   ['broken URL -> error state', { url: 'https://this-domain-does-not-exist-prism-demo.invalid', mode: 'tldr' }],
   ['invalid mode -> 400', { url: 'https://example.com', mode: 'bogus' }],
