@@ -101,6 +101,15 @@ the frontend, the mock data, and every in-progress branch assume it.
   player either way.
 - **Never commit `.env.local`** or real API keys. `.env.example` documents
   what's needed.
+- **Demo data must never stand in for a failed real request in a deployed
+  build.** `getDemoResponse()` ignores the URL and always returns the canned
+  "black holes" dataset, so substituting it renders a confident wrong answer
+  (an Artificial Intelligence page comes back as a NASA black-holes summary).
+  `src/api/client.js` gates the fallback behind `import.meta.env.DEV`, and
+  `Results.jsx` shows a banner whenever `_demo` is set. Don't loosen either.
+- **`lib/extract.js` fetches attacker-controlled URLs from inside our network.**
+  Keep `assertPublicHost()` on every request *and* every redirect hop, and keep
+  redirects manual — `redirect: 'follow'` silently reintroduces the SSRF.
 
 ## Commands
 

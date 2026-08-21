@@ -21,6 +21,14 @@ import { GeminiError } from '../lib/gemini.js';
 
 const VALID_MODES = new Set(['tldr', 'song', 'kid']);
 
+// Must match vercel.json's `maxDuration` for this function. Song mode's audio
+// step is best-effort and is given only the budget that's actually left, so a
+// slow extraction or a slow Gemini call costs us the track rather than the
+// whole request. The safety margin leaves room to serialize and send the
+// response (song payloads are ~0.6MB) before the platform pulls the plug.
+const FUNCTION_BUDGET_MS = 30000;
+const RESPONSE_MARGIN_MS = 3000;
+
 function siteFromExtraction(extraction) {
   return {
     url: extraction.url,
@@ -92,7 +100,9 @@ export default async function handler(req, res) {
       // Note: song audio is best-effort inside transformSong — a missing
       // ELEVENLABS_API_KEY or a failed compose yields audioUrl: null rather
       // than an error, so only a lyrics (Gemini) failure lands in the catch.
-      const song = await transformSong(extraction);
+      const song = await transformSong(extraction, {
+        deadline: started + FUNCTION_BUDGET_MS - RESPONSE_MARGIN_MS,
+      });
       return res.status(200).json({
         status: 'ok',
         mode: 'song',
