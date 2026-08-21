@@ -7,19 +7,10 @@ import {
   Check,
   BookmarkSimple,
 } from '@phosphor-icons/react';
-import { SegmentedControl, Button } from '../../design-system/components/index.js';
+import { Button } from '../../design-system/components/index.js';
 import { useAppState } from '../../state/AppState.jsx';
 import { useSongPlayback } from './useSongPlayback.js';
 import styles from './SongContent.module.css';
-
-// Demo-only per the product spec: picking a style swaps the displayed genre
-// label, it does NOT regenerate the song.
-const STYLE_OPTIONS = [
-  { value: 'Pop', label: 'Pop' },
-  { value: 'Rap', label: 'Rap' },
-  { value: 'Lo-fi', label: 'Lo-fi' },
-  { value: 'Rock', label: 'Rock' },
-];
 
 const WAVEFORM_BARS = 40;
 
@@ -54,11 +45,9 @@ function Waveform({ isPlaying }) {
 export function SongContent({ song }) {
   const { isCurrentResultSaved, saveCurrentResult, unsaveResult, state } = useAppState();
   const { isPlaying, elapsed, duration, isSimulated, toggle, seek, restart } = useSongPlayback(song);
-  const [selectedStyle, setSelectedStyle] = useState(null);
   const [copiedLyrics, setCopiedLyrics] = useState(false);
 
   const savedId = state.result ? `${state.result.site.url}::${state.result.mode}` : null;
-  const displayedGenre = selectedStyle || song.genre;
   const progress = duration > 0 ? (elapsed / duration) * 100 : 0;
 
   const seekFromEvent = (event) => {
@@ -98,18 +87,11 @@ export function SongContent({ song }) {
           <div className={styles.kicker}>MAKE A SONG</div>
           <h2 className={styles.title}>{song.title}</h2>
           <div className={styles.genreLine}>
-            {displayedGenre}
+            {song.genre}
             {song.mood ? ` · ${song.mood}` : ''}
           </div>
           <p className={styles.description}>{song.description}</p>
         </div>
-
-        <SegmentedControl
-          options={STYLE_OPTIONS}
-          value={selectedStyle}
-          onChange={setSelectedStyle}
-          aria-label="Song style"
-        />
 
         <div className={styles.playerCard}>
           <Waveform isPlaying={isPlaying} />

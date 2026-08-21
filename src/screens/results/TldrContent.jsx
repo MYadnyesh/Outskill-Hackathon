@@ -9,7 +9,6 @@ import {
   ClipboardText,
   BookmarkSimple,
   ShareNetwork,
-  ArrowsClockwise,
   Check,
 } from '@phosphor-icons/react';
 import { Pill, Button } from '../../design-system/components/index.js';
@@ -17,10 +16,9 @@ import { useAppState } from '../../state/AppState.jsx';
 import styles from './TldrContent.module.css';
 
 export function TldrContent({ site, tldr }) {
-  const { isCurrentResultSaved, saveCurrentResult, unsaveResult, refreshResult, state } = useAppState();
+  const { isCurrentResultSaved, saveCurrentResult, unsaveResult, state } = useAppState();
   const [copiedSummary, setCopiedSummary] = useState(false);
   const [copiedShare, setCopiedShare] = useState(false);
-  const [regenerating, setRegenerating] = useState(false);
 
   const savedId = state.result ? `${state.result.site.url}::${state.result.mode}` : null;
 
@@ -42,12 +40,6 @@ export function TldrContent({ site, tldr }) {
     }
     setCopiedShare(true);
     setTimeout(() => setCopiedShare(false), 1800);
-  };
-
-  const regenerate = async () => {
-    setRegenerating(true);
-    await refreshResult();
-    setRegenerating(false);
   };
 
   const stats = [
@@ -117,14 +109,6 @@ export function TldrContent({ site, tldr }) {
         </Button>
         <Button variant="secondary" icon={copiedShare ? <Check size={16} weight="bold" /> : <ShareNetwork size={16} />} onClick={share}>
           {copiedShare ? 'Copied' : 'Share'}
-        </Button>
-        <Button
-          variant="ghost"
-          icon={<ArrowsClockwise size={16} className={regenerating ? styles.spinning : ''} />}
-          onClick={regenerate}
-          disabled={regenerating}
-        >
-          {regenerating ? 'Regenerating…' : 'Regenerate'}
         </Button>
       </div>
     </div>
