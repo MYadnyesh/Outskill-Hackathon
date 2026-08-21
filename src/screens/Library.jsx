@@ -13,12 +13,12 @@ function formatSavedDate(iso) {
   }
 }
 
-export function Library({ onOpenLanding }) {
+export function Library({ onOpenLanding, onHowItWorks, onAbout }) {
   const { state, openLibraryItem, resetToLanding } = useAppState();
 
   return (
     <div>
-      <TopNav activeScreen="library" onHome={resetToLanding} onLibrary={() => {}} savedCount={state.library.length} />
+      <TopNav activeScreen="library" onHowItWorks={onHowItWorks} onAbout={onAbout} onHome={resetToLanding} onLibrary={() => {}} savedCount={state.library.length} />
       <div className={styles.page}>
         <h1 className={styles.heading}>My Library</h1>
         <p className={styles.subhead}>Every page you've saved, ready to reopen in the mode you saved it in.</p>

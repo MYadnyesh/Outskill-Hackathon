@@ -7,7 +7,7 @@
   padding: 0 var(--space-5);
   border-radius: var(--radius);
   font-family: var(--font-body);
-  font-weight: var(--fw-medium);
+  font-weight: var(--fw-semibold); /* DESIGN.md button: Inter 14 / 600 */
   font-size: var(--fs-body-sm);
   white-space: nowrap;
   border: 1px solid transparent;
@@ -19,25 +19,31 @@
   transform: translateY(1px);
 }
 
-/* Primary — outlined accent, never a solid fill */
+/* Primary — solid near-black. DESIGN.md's signature CTA: the accent is NOT
+   the primary action colour in this system, ink is. */
 .primary {
-  border-color: var(--accent-border);
-  color: var(--accent-text-strong);
-  background: transparent;
+  border-color: var(--primary);
+  color: var(--on-primary);
+  background: var(--primary);
 }
 .primary:hover {
-  background: var(--accent-tint);
-  border-color: var(--accent-border-hover);
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
 }
 .primary:active {
-  background: var(--accent-tint-hover);
+  background: var(--primary-hover);
+}
+.primary:disabled {
+  background: var(--primary-disabled);
+  border-color: var(--primary-disabled);
+  color: var(--text-muted);
 }
 
-/* Secondary — neutral outline/fill */
+/* Secondary — cream button with a hairline outline */
 .secondary {
-  border-color: var(--border-strong);
+  border-color: var(--border);
   color: var(--text-primary);
-  background: var(--surface-1);
+  background: var(--surface-0);
 }
 .secondary:hover {
   background: var(--surface-2);

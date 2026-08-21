@@ -59,7 +59,8 @@ src/api/client.js             frontend -> backend fetch, falls back to
 src/mock/demoData.js          canned "black holes" dataset, all 3 modes,
                                 shaped exactly like a real API response —
                                 use it as your fixture when building UI
-src/screens/                  Landing, Processing, Error, Results, Library
+src/screens/                  Landing, Processing, Error, Results, Library,
+                                About, HowItWorks (+ HeroArtifact, the hero SVG)
 src/screens/results/          TldrContent / SongContent / KidContent, plus
                                 useSongPlayback.js (owns the real-audio vs
                                 simulated-playback branch so the player UI
@@ -87,8 +88,20 @@ the frontend, the mock data, and every in-progress branch assume it.
 ## Hard rules
 
 - **Design tokens only.** Every color/spacing/radius/shadow comes from
-  `src/design-system/tokens.css`. No ad-hoc hex codes, no font weight past
-  500 (medium is the heaviest weight anywhere, including headings).
+  `src/design-system/tokens.css`. No ad-hoc hex codes anywhere else — that
+  discipline is what let the whole app switch from the old dark "Nocturne"
+  theme to "Clay" by rewriting one file.
+- **The design system is "Clay"** — see `DESIGN.md` (installed via
+  `npx getdesign@latest add clay`). Cream canvas, near-black ink and CTAs,
+  saturated feature cards. Display headings stay at weight 500 with negative
+  letter-spacing; titles and buttons use `--fw-semibold` (600). Cycle the
+  brand card colours and never repeat one adjacently.
+- **Check contrast before adding a colour pairing.** Two of `DESIGN.md`'s own
+  recommendations fail WCAG AA and are overridden in `tokens.css` (white on
+  `--brand-pink` is 3.14:1, raw lavender on cream is 2.11:1). Measured ratios
+  are noted inline there; keep that up if you add tones.
+- **SVG icons, never emoji.** Emoji render differently per platform and carry
+  no accessible name. The kit uses Phosphor throughout.
 - **Reuse the component kit** (`src/design-system/components/`) instead of
   hand-rolling a new button/card/input.
 - **Don't drive-by refactor shared files** — `design-system/`,

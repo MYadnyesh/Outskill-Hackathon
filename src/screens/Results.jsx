@@ -8,7 +8,7 @@ import { KidContent } from './results/KidContent.jsx';
 import { ComingSoon } from './results/ComingSoon.jsx';
 import styles from './Results.module.css';
 
-export function Results({ onOpenLibrary }) {
+export function Results({ onOpenLibrary, onHowItWorks, onAbout }) {
   const { state, resetToLanding } = useAppState();
   const result = state.result;
 
@@ -21,7 +21,7 @@ export function Results({ onOpenLibrary }) {
   // VALID_MODES in api/analyze.js.
   return (
     <div>
-      <TopNav activeScreen="results" onHome={resetToLanding} onLibrary={onOpenLibrary} savedCount={state.library.length} />
+      <TopNav activeScreen="results" onHowItWorks={onHowItWorks} onAbout={onAbout} onHome={resetToLanding} onLibrary={onOpenLibrary} savedCount={state.library.length} />
       <div className={styles.page}>
         {/* Demo data ignores the submitted URL entirely (see src/api/client.js),
             so it must never be mistaken for a real transform of that page. */}

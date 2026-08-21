@@ -1,104 +1,153 @@
 /*
-  Prism — "Nocturne" design tokens.
-  Colors are OKLCH-derived tonal ramps computed from the two source colors:
-    background  #161826  -> oklch(21.4% 0.0278 277.5)
-    accent-500  #9184d9  -> oklch(66.0% 0.1245 289.6)
-  Neutral ramp shares the background's hue; accent ramp shares the accent's hue.
-  100 = lightest, 900 = darkest, for BOTH ramps. Do not add a second hue.
+  Prism — "Clay" design tokens.
+  Adapted from DESIGN.md (getdesign `clay` template, based on Clay.com).
+
+  This replaced the previous dark "Nocturne" system. The palette is a warm
+  cream canvas with near-black ink and a six-colour saturated card set. The
+  ramps below still run 100 = lightest -> 900 = darkest, but the SEMANTIC
+  layer is inverted from Nocturne: surfaces now come from the light end of
+  the neutral ramp and text from the dark end.
+
+  Accent is Clay's lavender (#b8a4ed). DESIGN.md assigns lavender to
+  "AI-agent products", which is exactly what Prism is — and it stays close
+  to Nocturne's old blurple, so the brand doesn't lurch.
+
+  Rule that carried over: every colour/space/radius/shadow in the app comes
+  from this file. No ad-hoc hex anywhere else.
 */
 
 :root {
-  /* ---- Source colors (exact) ---- */
-  --color-bg: #161826;
-  --color-text: #e9e9ed;
-  --color-accent-500: #9184d9;
+  /* ---- Source colors (exact, from DESIGN.md) ---- */
+  --color-bg: #fffaf0;       /* canvas — the cream tint is non-negotiable */
+  --color-text: #0a0a0a;     /* ink */
+  --color-accent-500: #b8a4ed; /* brand-lavender */
 
-  /* ---- Neutral ramp (blue-grey, hue 277.5) ---- */
-  --neutral-100: oklch(93% 0.0097 277.5);
-  --neutral-200: oklch(83% 0.0153 277.5);
-  --neutral-300: oklch(72% 0.0208 277.5);
-  --neutral-400: oklch(60% 0.0250 277.5);
-  --neutral-500: oklch(50% 0.0278 277.5);
-  --neutral-600: oklch(40% 0.0278 277.5);
-  --neutral-700: oklch(33% 0.0264 277.5);
-  --neutral-800: oklch(27% 0.0236 277.5);
-  --neutral-900: oklch(21.4% 0.0194 277.5); /* == --color-bg */
+  /* ---- Neutral ramp (warm, cream -> ink) ---- */
+  --neutral-100: #fffaf0; /* canvas */
+  --neutral-200: #faf5e8; /* surface-soft */
+  --neutral-300: #f5f0e0; /* surface-card */
+  --neutral-400: #ebe6d6; /* surface-strong */
+  --neutral-500: #e5e5e5; /* hairline */
+  --neutral-600: #9a9a9a; /* muted-soft */
+  --neutral-700: #6a6a6a; /* muted */
+  --neutral-800: #3a3a3a; /* body */
+  --neutral-900: #0a0a0a; /* ink */
 
-  /* ---- Accent ramp (blurple, hue 289.6) ---- */
-  --accent-100: oklch(94% 0.0311 289.6);
-  --accent-200: oklch(87% 0.0560 289.6);
-  --accent-300: oklch(79% 0.0809 289.6);
-  --accent-400: oklch(71% 0.1058 289.6);
-  --accent-500: oklch(66% 0.1245 289.6); /* == --color-accent-500 */
-  --accent-600: oklch(55% 0.1220 289.6);
-  --accent-700: oklch(44% 0.1058 289.6);
-  --accent-800: oklch(33% 0.0847 289.6);
-  --accent-900: oklch(22% 0.0622 289.6);
+  /* ---- Accent ramp (lavender, hue ~285) ----
+     400 is DESIGN.md's exact brand-lavender. 600-800 are darkened so accent
+     TEXT clears 4.5:1 on the cream canvas — the raw lavender does not. */
+  --accent-100: #f4efff;
+  --accent-200: #e6dcfb;
+  --accent-300: #d0c0f5;
+  --accent-400: #b8a4ed; /* == --color-accent-500, the brand tone */
+  --accent-500: #9a7fe0;
+  --accent-600: #7a58cf;
+  --accent-700: #5b3aa8; /* accent text on cream */
+  --accent-800: #3f2775;
+  --accent-900: #281848;
 
-  /* ---- Semantic surfaces / text (built from the ramps above) ---- */
-  --surface-0: var(--color-bg);        /* page ground */
-  --surface-1: var(--neutral-800);     /* elevation 1: resting cards */
-  --surface-2: var(--neutral-700);     /* elevation 2: hovered / active surfaces */
-  --surface-3: var(--neutral-600);     /* elevation 3: popovers, modals */
+  /* ---- Brand card colours (DESIGN.md's six-colour set) ----
+     Cycle these across a page; never repeat one twice in a row. */
+  --brand-pink: #ff4d8b;
+  --brand-teal: #1a3a3a;
+  --brand-lavender: #b8a4ed;
+  --brand-peach: #ffb084;
+  --brand-ochre: #e8b94a;
+  --brand-mint: #a4d4c5;
+  --brand-coral: #ff6b5a;
+  /* Text colour to use ON each card. DESIGN.md says white on pink AND teal,
+     but white on #ff4d8b measures only 3.14:1 — it fails WCAG AA. Teal is
+     fine (12.28:1); pink takes ink instead (6.30:1). */
+  --on-brand-dark: #ffffff;   /* teal only */
+  --on-brand-light: #0a0a0a;  /* pink, lavender, peach, ochre, mint */
 
-  --border-subtle: var(--neutral-800);
-  --border: var(--neutral-700);
+  /* ---- Semantic surfaces / text ---- */
+  --surface-0: var(--color-bg);      /* page ground — cream canvas */
+  --surface-1: var(--neutral-200);   /* elevation 1: resting cards */
+  --surface-2: var(--neutral-300);   /* elevation 2: hovered / active */
+  --surface-3: var(--neutral-400);   /* elevation 3: popovers, emphasis */
+
+  --border-subtle: var(--neutral-400);
+  --border: var(--neutral-500);
   --border-strong: var(--neutral-600);
 
-  --text-primary: var(--color-text);
-  --text-secondary: var(--neutral-300);
-  --text-muted: var(--neutral-400);
-  --text-disabled: var(--neutral-500);
+  --text-primary: var(--color-text);   /* ink       — 20.1:1 on canvas */
+  --text-secondary: var(--neutral-800); /* body      — 10.8:1 */
+  --text-muted: var(--neutral-700);     /* muted     —  5.4:1 */
+  /* 2.70:1 on canvas — DISABLED CONTROLS ONLY, which WCAG 1.4.3 exempts.
+     Never use this for text a user has to read. */
+  --text-disabled: var(--neutral-600);
 
-  --accent: var(--accent-500);              /* lines, borders, small icon fills, glows ONLY — never large fills */
-  --accent-text: var(--accent-200);         /* body-copy-sized accent text (meets contrast) */
-  --accent-text-strong: var(--accent-100);
-  --accent-border: var(--accent-700);
-  --accent-border-hover: var(--accent-600);
-  --accent-tint: var(--accent-900);         /* faint tinted background fill */
-  --accent-tint-hover: var(--accent-800);
-  --accent-glow: color-mix(in oklch, var(--accent-500) 45%, transparent);
+  --accent: var(--accent-400);              /* borders, small fills, decorative */
+  --accent-text: var(--accent-700);         /* accent text on cream (7.4:1) */
+  --accent-text-strong: var(--accent-800);
+  /* accent-400 on cream is only 2.11:1 — invisible as a boundary. Borders
+     that must be perceivable use 600 (4.89:1, clears the 3:1 UI minimum). */
+  --accent-border: var(--accent-600);
+  --accent-border-hover: var(--accent-700);
+  --accent-tint: var(--accent-100);         /* faint tinted background fill */
+  --accent-tint-hover: var(--accent-200);
+  --accent-glow: color-mix(in oklch, var(--accent-500) 30%, transparent);
+
+  /* ---- Primary action (DESIGN.md: near-black CTAs, not the accent) ---- */
+  --primary: #0a0a0a;
+  --primary-hover: #1f1f1f;
+  --primary-disabled: #e5e5e5;
+  --on-primary: #ffffff;
+
+  /* ---- Semantic status ---- */
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --error: #ef4444;
 
   /* ---- Type ---- */
   --font-heading: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-body: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --fw-regular: 400;
-  --fw-medium: 500; /* heaviest weight used anywhere, incl. headings */
+  --fw-medium: 500;
+  --fw-semibold: 600; /* DESIGN.md uses 600 for titles/buttons; display stays 500 */
 
-  --fs-display: clamp(2.25rem, 1.1rem + 4.5vw, 3.75rem); /* ~60px desktop hero */
-  --fs-h1: clamp(1.75rem, 1.3rem + 1.8vw, 2.5rem);
-  --fs-h2: clamp(1.375rem, 1.15rem + 0.9vw, 1.75rem);
-  --fs-h3: clamp(1.125rem, 1.02rem + 0.4vw, 1.375rem);
-  --fs-body-lg: 1.1875rem; /* 19px — TL;DR summary reading size */
+  /* Display sizes keep weight 500 + negative tracking, per DESIGN.md's
+     "Plain Black at 500" rule (Inter 500 is its documented substitute). */
+  --fs-display: clamp(2.5rem, 1.1rem + 5.4vw, 4.5rem); /* ~72px desktop hero */
+  --fs-h1: clamp(2rem, 1.4rem + 2.4vw, 3.5rem);
+  --fs-h2: clamp(1.5rem, 1.2rem + 1.3vw, 2.5rem);
+  --fs-h3: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  --fs-body-lg: 1.1875rem;
   --fs-body: 1rem;
   --fs-body-sm: 0.875rem;
-  --fs-caption: 0.75rem;
-  --fs-micro: 0.6875rem; /* uppercase kickers / stat labels */
+  --fs-caption: 0.8125rem;
+  --fs-micro: 0.75rem; /* uppercase kickers — 12px, DESIGN.md caption-uppercase */
 
-  --lh-tight: 1.15;
+  --tracking-display: -0.03em; /* the negative tracking IS the brand voice */
+  --tracking-tight: -0.02em;
+  --tracking-wide: 0.1em;      /* uppercase kickers */
+
+  --lh-tight: 1.05;
   --lh-snug: 1.35;
   --lh-normal: 1.55;
 
-  /* ---- Spacing: compact 8-step scale (~0.7x a normal 4/8/16/24/32/48/64/96 scale) ---- */
-  --space-1: 0.1875rem; /* 3px */
-  --space-2: 0.375rem;  /* 6px */
-  --space-3: 0.6875rem; /* 11px */
-  --space-4: 1.0625rem; /* 17px */
-  --space-5: 1.375rem;  /* 22px */
-  --space-6: 2.125rem;  /* 34px */
-  --space-7: 2.8125rem; /* 45px */
-  --space-8: 4.1875rem; /* 67px */
+  /* ---- Spacing: DESIGN.md's 4px-base scale ---- */
+  --space-1: 0.25rem;  /* 4px  */
+  --space-2: 0.5rem;   /* 8px  */
+  --space-3: 0.75rem;  /* 12px */
+  --space-4: 1rem;     /* 16px */
+  --space-5: 1.5rem;   /* 24px */
+  --space-6: 2rem;     /* 32px */
+  --space-7: 3rem;     /* 48px */
+  --space-8: 6rem;     /* 96px — section rhythm */
 
-  /* ---- Radius: 8px base throughout ---- */
-  --radius-sm: 0.375rem;  /* 6px — pills, tiny chips */
-  --radius: 0.5rem;       /* 8px — base, used almost everywhere */
-  --radius-lg: 0.75rem;   /* 12px — large cards, modals */
-  --radius-full: 999px;   /* fully round — icon buttons, badges */
+  /* ---- Radius: generous, matching the rounded display type ---- */
+  --radius-sm: 0.375rem; /* 6px  */
+  --radius: 0.75rem;     /* 12px — buttons + inputs */
+  --radius-lg: 1rem;     /* 16px — content cards */
+  --radius-xl: 1.5rem;   /* 24px — feature cards */
+  --radius-full: 9999px;
 
-  /* ---- Shadows: thin edge + ambient darkness only, never a heavy drop shadow ---- */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.28);
-  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.38);
-  --shadow-lg: 0 14px 34px rgba(0, 0, 0, 0.48);
+  /* ---- Shadows: light-canvas depth is carried by colour, not shadow ---- */
+  --shadow-sm: 0 1px 2px rgba(10, 10, 10, 0.06);
+  --shadow-md: 0 4px 14px rgba(10, 10, 10, 0.08);
+  --shadow-lg: 0 14px 34px rgba(10, 10, 10, 0.10);
 
   /* ---- Motion ---- */
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
@@ -107,10 +156,10 @@
   --transition-slow: 320ms var(--ease-standard);
 
   /* ---- Interaction ---- */
-  --focus-ring-color: var(--accent-500);
+  --focus-ring-color: var(--accent-600);
   --disabled-opacity: 0.45;
 
   /* ---- Layout ---- */
-  --content-max: 74rem;
-  --nav-height: 3.75rem;
+  --content-max: 80rem; /* 1280px, per DESIGN.md */
+  --nav-height: 4rem;   /* 64px */
 }

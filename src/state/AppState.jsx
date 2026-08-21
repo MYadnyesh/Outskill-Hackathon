@@ -14,7 +14,8 @@ const AppStateContext = createContext(null);
 const MODES = ['tldr', 'song', 'kid'];
 
 const initialState = {
-  screen: 'landing', // 'landing' | 'processing' | 'results' | 'error' | 'library'
+  // 'landing' | 'processing' | 'results' | 'error' | 'library' | 'about' | 'how'
+  screen: 'landing',
   pendingUrl: '',
   selectedMode: 'tldr', // landing's mode picker; default per spec
   result: null, // last successful /api/analyze payload
@@ -42,6 +43,10 @@ function reducer(state, action) {
       return { ...state, screen: 'landing', pendingUrl: '', result: null, error: null };
     case 'GO_TO_LIBRARY':
       return { ...state, screen: 'library' };
+    // Static content pages (About / How it works). They don't touch `result`,
+    // so returning Home from one leaves any existing result intact.
+    case 'GO_TO_SCREEN':
+      return { ...state, screen: action.screen };
     case 'OPEN_LIBRARY_ITEM': {
       const item = state.library.find((i) => i.id === action.id);
       if (!item) return state;
@@ -101,6 +106,7 @@ export function AppStateProvider({ children }) {
 
   const resetToLanding = useCallback(() => dispatch({ type: 'RESET_TO_LANDING' }), []);
   const goToLibrary = useCallback(() => dispatch({ type: 'GO_TO_LIBRARY' }), []);
+  const goToScreen = useCallback((screen) => dispatch({ type: 'GO_TO_SCREEN', screen }), []);
   const openLibraryItem = useCallback((id) => dispatch({ type: 'OPEN_LIBRARY_ITEM', id }), []);
   const saveCurrentResult = useCallback(() => dispatch({ type: 'SAVE_CURRENT_RESULT' }), []);
   const unsaveResult = useCallback((id) => dispatch({ type: 'UNSAVE_RESULT', id }), []);
@@ -138,6 +144,7 @@ export function AppStateProvider({ children }) {
       startTransform,
       resetToLanding,
       goToLibrary,
+      goToScreen,
       openLibraryItem,
       saveCurrentResult,
       unsaveResult,
@@ -150,6 +157,7 @@ export function AppStateProvider({ children }) {
       startTransform,
       resetToLanding,
       goToLibrary,
+      goToScreen,
       openLibraryItem,
       saveCurrentResult,
       unsaveResult,

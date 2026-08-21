@@ -318,11 +318,32 @@ small time gap between scraping and output generation" — concretely:
   the day's budget across all five fallback models. Fine for a private demo;
   worth an IP-based limit or a shared secret if the URL is posted anywhere.
 
+## Feature: About & How-it-works pages — BUILT
+
+`src/screens/About.jsx` and `src/screens/HowItWorks.jsx`, reachable from the
+top nav on every screen. They are static content pages: `AppState` gained one
+generic `goToScreen(name)` action rather than a per-page action, and neither
+page touches `result`, so returning Home from one leaves an existing result
+intact.
+
+The team list in `About.jsx` is a plain array at the top of the file — add
+`{ name, role, handle }` entries there. Only contributors verifiable from the
+repo's commit history are listed today; nobody was invented to fill the grid.
+
 ## Feature: Design QA & accessibility pass
 
-- Audit every screen against `src/design-system/tokens.css` — no ad-hoc
-  hex colors, no font weights past 500, no radius values outside the
-  `--radius-*` tokens.
+- ~~Audit every screen against `tokens.css`~~ **Done (Aug 21).** Zero ad-hoc
+  hex values outside `tokens.css` across all 19 stylesheets — which is what
+  made the switch from the dark "Nocturne" theme to "Clay" a one-file rewrite.
+  Every palette pairing was measured: three failed and were fixed (white on
+  `--brand-pink` 3.14:1 and raw lavender on cream 2.11:1 are both `DESIGN.md`
+  recommendations that do not meet WCAG AA; `--text-disabled` at 2.70:1 is now
+  documented as disabled-only, which WCAG exempts).
+- ~~Emoji used as mode icons~~ **Done (Aug 21).** Replaced with Phosphor SVG.
+- ~~Nav overflowed at 375px~~ **Done (Aug 21).** Four links did not fit beside
+  the wordmark and pushed the page 26px sideways. Collapses to a disclosure
+  menu below 768px per `DESIGN.md`, with Escape closing it and returning focus
+  to the trigger. Verified: no horizontal overflow on any page at 375px.
 - Confirm `:focus-visible` (2px solid accent, 2px offset) shows up
   correctly on every interactive element, including inside the quiz once
   Kid mode lands.
