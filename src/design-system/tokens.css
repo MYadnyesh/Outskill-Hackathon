@@ -103,9 +103,15 @@
   /* ---- Type ---- */
   --font-heading: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-body: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --fw-regular: 400;
-  --fw-medium: 500;
-  --fw-semibold: 600; /* DESIGN.md uses 600 for titles/buttons; display stays 500 */
+  /* Weights run one step heavier than DESIGN.md specifies. Clay's spec caps
+     display at 500 ("700 reads as bombastic"), but that was written for Plain
+     Black — a genuinely rounded display face. Inter at 500 renders noticeably
+     lighter than Plain Black at the same number, so matching the spec by
+     number undersells it. Inter is loaded as a variable axis, so these can be
+     tuned to any value without adding another font request. */
+  --fw-regular: 450;   /* body copy */
+  --fw-medium: 600;    /* display headings */
+  --fw-semibold: 680;  /* card titles, buttons, labels */
 
   /* Display sizes keep weight 500 + negative tracking, per DESIGN.md's
      "Plain Black at 500" rule (Inter 500 is its documented substitute). */
@@ -116,8 +122,8 @@
   --fs-body-lg: 1.1875rem;
   --fs-body: 1rem;
   --fs-body-sm: 0.875rem;
-  --fs-caption: 0.8125rem;
-  --fs-micro: 0.75rem; /* uppercase kickers — 12px, DESIGN.md caption-uppercase */
+  --fs-caption: 0.875rem;  /* 14px — was 13px, too small for supporting copy */
+  --fs-micro: 0.8125rem;   /* 13px — uppercase kickers; wide tracking needs the size */
 
   --tracking-display: -0.03em; /* the negative tracking IS the brand voice */
   --tracking-tight: -0.02em;
