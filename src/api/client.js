@@ -22,7 +22,12 @@ export const EXAMPLE_URLS = [
   { label: 'a page that will fail (demo)', url: BROKEN_DEMO_URL, isBrokenDemo: true },
 ];
 
-const REQUEST_TIMEOUT_MS = 20000;
+// Must exceed the backend's own worst case, which is FETCH_TIMEOUT_MS (8s,
+// lib/extract.js) + TIMEOUT_MS (20s, lib/gemini.js) = 28s. If this fires first
+// the catch below silently substitutes demo data, so a slow-but-successful
+// transform would show canned "black holes" content for the user's real URL
+// with nothing on screen saying so. Keep this above 28s.
+const REQUEST_TIMEOUT_MS = 30000;
 
 function brokenDemoError() {
   return {
