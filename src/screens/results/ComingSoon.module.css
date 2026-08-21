@@ -20,11 +20,3 @@
   color: var(--text-secondary);
   line-height: var(--lh-normal);
 }
-
-.mono {
-  font-size: var(--fs-caption);
-  color: var(--text-muted);
-  background: var(--surface-2);
-  border-radius: var(--radius-sm);
-  padding: var(--space-1) var(--space-2);
-}

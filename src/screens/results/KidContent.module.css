@@ -1,0 +1,143 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.kicker {
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+
+.headline {
+  font-size: var(--fs-h1);
+  color: var(--text-primary);
+  margin-top: var(--space-2);
+}
+
+.subhead {
+  font-size: var(--fs-body);
+  color: var(--text-secondary);
+  margin-top: var(--space-2);
+}
+
+.cardHeading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-medium);
+  color: var(--text-primary);
+}
+
+.headingIcon {
+  flex: none;
+  color: var(--accent);
+}
+
+.body {
+  font-size: var(--fs-body);
+  line-height: var(--lh-normal);
+  color: var(--text-secondary);
+}
+
+.storyBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.factsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: var(--space-3);
+}
+
+.factCard {
+  padding: var(--space-4);
+  border-radius: var(--radius);
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  font-size: var(--fs-body-sm);
+  color: var(--text-secondary);
+  line-height: var(--lh-snug);
+}
+
+.quizHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.quizList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.quizQuestion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.quizPrompt {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-medium);
+  color: var(--text-primary);
+}
+
+.quizOptions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.quizOption {
+  justify-content: space-between;
+  width: 100%;
+  height: auto;
+  min-height: 2.75rem;
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  white-space: normal;
+}
+
+/* Answered options stay fully opaque so the feedback below reads clearly, but
+   must stop looking interactive — they use aria-disabled, not disabled, so
+   the base button's hover styling would otherwise still fire. */
+.quizOption[aria-disabled='true'] {
+  cursor: default;
+}
+.quizOption[aria-disabled='true']:not(.optionCorrect):not(.optionWrong):not(.optionReveal):hover {
+  background: var(--surface-1);
+  border-color: var(--border-strong);
+}
+
+.optionCorrect {
+  border-color: var(--accent-border);
+  background: var(--accent-tint);
+  color: var(--accent-text-strong);
+}
+
+.optionWrong {
+  border-color: var(--border-strong);
+  color: var(--text-muted);
+}
+
+.optionReveal {
+  border: 2px dashed var(--accent);
+}
+
+.correctIcon {
+  color: var(--accent-text-strong);
+}
+
+.wrongIcon {
+  color: var(--text-muted);
+}
