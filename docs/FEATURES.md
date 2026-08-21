@@ -312,6 +312,15 @@ small time gap between scraping and output generation" — concretely:
   including the redirect bypass, while real URLs (and bare-domain input, and
   cross-host redirects like `nasa.gov` → `science.nasa.gov`) still work.
   Note `site.domain` now reports the **final** host after redirects.
+- ~~One slow model starved every fallback~~ **Fixed (Aug 21).** Symptom was
+  `AI_ERROR` on every request even though two models were healthy. Cause:
+  `gemini-3.7-flash` answered 503 after 80s, burning the shared 20s budget
+  before the walk reached a working model — and the cursor only advanced on
+  *success*, so each new request re-paid the whole penalty. Now failures go
+  into a cooldown map (10 min for quota/retired, 60s for overload/timeout) and
+  `DEFAULT_MODELS` is ordered by observed reliability rather than nominal
+  capability. Cold-start after the fix: tldr 5.0s, kid 11.3s, song 17.9s, all
+  200.
 - **Still open — no rate limiting.** `POST /api/analyze` is public,
   unauthenticated and `Access-Control-Allow-Origin: *`, and every call spends
   Gemini quota. With 20 requests/day/model, a handful of `curl`s can exhaust
