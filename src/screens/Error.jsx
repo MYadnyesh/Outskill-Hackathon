@@ -19,7 +19,7 @@ export function ErrorScreen() {
         </p>
 
         <div className={styles.chipsRow}>
-          {EXAMPLE_URLS.filter((e) => !e.isBrokenDemo).map((example) => (
+          {EXAMPLE_URLS.map((example) => (
             <button
               key={example.url}
               type="button"
