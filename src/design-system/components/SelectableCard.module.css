@@ -4,8 +4,8 @@
   gap: var(--space-2);
   align-items: flex-start;
   text-align: left;
-  padding: var(--space-5);
-  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  border-radius: var(--radius-xl); /* feature-card radius, per DESIGN.md */
   border: 1px solid var(--border);
   background: var(--surface-1);
   transition: border-color var(--transition-fast), background-color var(--transition-fast);
@@ -16,9 +16,25 @@
   border-color: var(--border-strong);
 }
 
+/* Selected card fills with its brand tone — the saturated card IS the
+   selection signal, exactly as DESIGN.md uses colour for the featured tier.
+   Text flips to ink on all five tones we use (white on this pink is only
+   3.14:1, so ink is used there too). */
 .selected {
-  border-color: var(--accent);
-  background: var(--accent-tint);
+  border-color: transparent;
+  color: var(--on-brand-light);
+}
+.selected[data-tone='ochre']    { background: var(--brand-ochre); }
+.selected[data-tone='pink']     { background: var(--brand-pink); }
+.selected[data-tone='lavender'] { background: var(--brand-lavender); }
+.selected[data-tone='peach']    { background: var(--brand-peach); }
+.selected[data-tone='mint']     { background: var(--brand-mint); }
+
+.selected .title,
+.selected .desc,
+.selected .icon,
+.selected .check {
+  color: var(--on-brand-light);
 }
 
 .top {
@@ -28,9 +44,9 @@
   width: 100%;
 }
 
-.iconEmoji {
-  font-size: 1.5rem;
-  line-height: 1;
+.icon {
+  color: var(--text-primary);
+  flex: none;
 }
 
 .check {
@@ -40,7 +56,7 @@
 
 .title {
   font-family: var(--font-heading);
-  font-weight: var(--fw-medium);
+  font-weight: var(--fw-semibold); /* card title: Inter 18 / 600 */
   font-size: var(--fs-body-lg);
   color: var(--text-primary);
 }

@@ -1,32 +1,38 @@
 import { useState } from 'react';
-import { ArrowRight, MusicNotes, BookOpen, Lightning, Sparkle } from '@phosphor-icons/react';
+import { ArrowRight, MusicNotes, BookOpen, Lightning } from '@phosphor-icons/react';
+import { HeroArtifact } from './HeroArtifact.jsx';
 import { useAppState } from '../state/AppState.jsx';
 import { TopNav, TextField, Button, SelectableCard } from '../design-system/components/index.js';
 import { EXAMPLE_URLS } from '../api/client.js';
 import styles from './Landing.module.css';
 
+// Tones cycle across DESIGN.md's saturated card set and never repeat
+// adjacently. Lavender is reserved for Kid mode's storytelling.
 const MODES = [
   {
     id: 'tldr',
-    emoji: '⚡',
+    icon: Lightning,
+    tone: 'ochre',
     title: 'TL;DR',
     description: 'Get the important stuff in seconds.',
   },
   {
     id: 'song',
-    emoji: '🎵',
+    icon: MusicNotes,
+    tone: 'pink',
     title: 'Make a Song',
     description: 'Turn knowledge into something you can sing.',
   },
   {
     id: 'kid',
-    emoji: '🧸',
+    icon: BookOpen,
+    tone: 'lavender',
     title: "Explain Like I'm 5",
     description: 'Turn complicated ideas into something kids can understand.',
   },
 ];
 
-export function Landing({ onOpenLibrary }) {
+export function Landing({ onOpenLibrary, onHowItWorks, onAbout }) {
   const { state, setSelectedMode, startTransform } = useAppState();
   const [inputValue, setInputValue] = useState('');
   const [touched, setTouched] = useState(false);
@@ -47,14 +53,10 @@ export function Landing({ onOpenLibrary }) {
 
   return (
     <div>
-      <TopNav activeScreen="landing" onHome={() => {}} onLibrary={onOpenLibrary} savedCount={state.library.length} />
+      <TopNav activeScreen="landing" onHowItWorks={onHowItWorks} onAbout={onAbout} onHome={() => {}} onLibrary={onOpenLibrary} savedCount={state.library.length} />
       <div className={styles.page}>
         <div className={styles.hero}>
-          <Sparkle weight="fill" size={22} className={`${styles.decor} ${styles.decor1}`} />
-          <MusicNotes weight="fill" size={30} className={`${styles.decor} ${styles.decor2}`} />
-          <BookOpen weight="fill" size={26} className={`${styles.decor} ${styles.decor3}`} />
-          <Lightning weight="fill" size={22} className={`${styles.decor} ${styles.decor4}`} />
-
+          <div className={styles.heroCopy}>
           <div className={styles.kicker}>One URL. Three ways to understand it.</div>
           <h1 className={styles.headline}>Paste a website. Make it interesting.</h1>
           <p className={styles.subhead}>
@@ -96,6 +98,9 @@ export function Landing({ onOpenLibrary }) {
               </button>
             ))}
           </div>
+          </div>
+
+          <HeroArtifact />
         </div>
 
         <div className={styles.modeLabel}>Pick how you want to experience it</div>
@@ -104,7 +109,8 @@ export function Landing({ onOpenLibrary }) {
             <SelectableCard
               key={mode.id}
               name="mode"
-              emoji={mode.emoji}
+              icon={mode.icon}
+              tone={mode.tone}
               title={mode.title}
               description={mode.description}
               selected={state.selectedMode === mode.id}

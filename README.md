@@ -23,16 +23,16 @@ Built for the Outskill Hackathon.
 | 🎵 Make a Song | **Live** — real Gemini lyrics; real audio when an ElevenLabs key is set, simulated player otherwise |
 | 🧸 Explain Like I'm 5 | **Live** — real Gemini explanation, story, fun facts, and quiz |
 
-Landing, processing animation, error handling, save/share, and the Library
-all work today for every mode. Remaining work is polish rather than new
-modes — Library affordances, backend reliability, and a design/accessibility
-pass, all specced in [`docs/FEATURES.md`](docs/FEATURES.md).
+Landing, processing animation, error handling, save/share, the Library, and
+the About and How-it-works pages all work today for every mode. Remaining work
+is polish rather than new modes — Library affordances and backend caching, both
+specced in [`docs/FEATURES.md`](docs/FEATURES.md).
 
 ## Tech stack
 
 - **Frontend**: Vite + React, plain CSS (custom properties + CSS Modules,
-  no utility framework) — the "Nocturne" design system lives in
-  `src/design-system/`.
+  no utility framework) — the "Clay" design system lives in
+  `src/design-system/`, implementing [`DESIGN.md`](DESIGN.md).
 - **Backend**: Vercel serverless functions (`/api`), no separate server to
   run or host.
 - **AI**: [Google Gemini](https://aistudio.google.com/apikey) (free tier,
@@ -90,21 +90,34 @@ src/design-system/        tokens, base styles, shared component kit
 src/state/AppState.jsx    the whole app's state machine
 src/api/client.js         frontend -> backend, with mock-data fallback
 src/mock/demoData.js      canned "black holes" dataset, all 3 modes
-src/screens/              Landing, Processing, Error, Results, Library
+src/screens/              Landing, Processing, Error, Results, Library,
+                          About, HowItWorks
 src/screens/results/      per-mode content components + useSongPlayback
 scripts/test-api.js       local smoke test for api/analyze.js (no CLI needed)
 scripts/test-extract.js   unit test for HTML parsing (no network needed)
 docs/FEATURES.md          remaining polish work + exact specs
+DESIGN.md                 the Clay design spec the UI implements
 ```
 
 ## Design system
 
-"Nocturne" — a quiet, compact dark UI: near-black blue-grey ground
-(`#161826`), a single blurple accent (`#9184d9`) used only as outlines,
-small fills, and glows (never a solid flood), Inter at up to weight 500
-only, an 8px base radius, and OKLCH-derived neutral/accent ramps. Tokens
-are defined once in `src/design-system/tokens.css` — always pull from
-there rather than hardcoding a color or spacing value.
+**"Clay"** — a warm, light interface adapted from [`DESIGN.md`](DESIGN.md),
+installed with `npx getdesign@latest add clay`. A cream canvas (`#fffaf0`)
+carries near-black ink type, solid near-black CTAs, and a six-colour set of
+saturated feature cards (pink, teal, lavender, peach, ochre, mint) that do the
+work most interfaces give to shadows. Display headlines run Inter 500 with
+negative letter-spacing; titles and buttons use 600. Radius is generous — 12px
+for controls, 16px for cards, 24px for feature cards.
+
+Tokens are defined once in `src/design-system/tokens.css` — always pull from
+there rather than hardcoding a colour or spacing value. Every colour pairing in
+the palette is checked against WCAG AA (4.5:1 for text, 3:1 for UI boundaries);
+two of `DESIGN.md`'s own recommendations fail that bar and are deliberately
+overridden in the token file, with the measured ratios noted inline.
+
+> Prism was previously a dark theme called "Nocturne". Because every component
+> reads from tokens and no file hardcodes a colour, switching the whole app to
+> Clay was a rewrite of `tokens.css` plus a handful of component fixes.
 
 ## Known limitations (by design, for now)
 
@@ -115,7 +128,7 @@ there rather than hardcoding a color or spacing value.
   falls back to simulated playback (`audioUrl: null`) — it never fails the
   request. Generated audio is returned as a base64 `data:` URI (the API
   hands back raw bytes and this project has no blob storage), which is why
-  `lib/elevenlabs.js` caps track length at 60s.
+  `lib/elevenlabs.js` caps track length at 30s.
 - Google Fonts (Inter) requires normal internet access to load — it won't
   render in network-restricted sandboxes, only real browsers/deployments.
 - `GEMINI_MODEL` defaults to `gemini-3.6-flash` (see `lib/gemini.js`) —

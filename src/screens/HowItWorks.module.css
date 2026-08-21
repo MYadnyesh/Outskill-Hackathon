@@ -1,0 +1,187 @@
+.page {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--space-7) var(--space-6) var(--space-8);
+}
+
+/* ---- hero ---- */
+.hero {
+  max-width: 46rem;
+  padding: var(--space-6) 0 var(--space-7);
+}
+
+.kicker {
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--accent-text);
+  margin-bottom: var(--space-4);
+}
+
+.headline {
+  font-size: var(--fs-h1);
+  margin-bottom: var(--space-4);
+}
+
+.lede {
+  font-size: var(--fs-body-lg);
+  color: var(--text-secondary);
+  line-height: var(--lh-normal);
+}
+
+/* ---- sections ---- */
+.section {
+  padding-top: var(--space-7);
+}
+
+.sectionTitle {
+  font-size: var(--fs-h2);
+  margin-bottom: var(--space-4);
+}
+
+.sectionLede {
+  color: var(--text-secondary);
+  max-width: 46rem;
+  margin-bottom: var(--space-5);
+}
+
+/* ---- pipeline steps: saturated feature cards ---- */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  list-style: none;
+}
+
+.step {
+  padding: var(--space-6);
+  border-radius: var(--radius-xl);
+  color: var(--on-brand-light);
+  min-width: 0;
+}
+.step[data-tone='ochre'] { background: var(--brand-ochre); }
+.step[data-tone='pink'] { background: var(--brand-pink); }
+.step[data-tone='lavender'] { background: var(--brand-lavender); }
+.step[data-tone='mint'] { background: var(--brand-mint); }
+
+.stepTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.stepNum {
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tracking-wide);
+  opacity: 0.7;
+}
+
+.stepTitle {
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tracking-tight);
+  margin-bottom: var(--space-3);
+}
+
+.stepBody {
+  font-size: var(--fs-body-sm);
+  line-height: var(--lh-normal);
+}
+
+/* ---- modes ---- */
+.modeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+.modeCard {
+  padding: var(--space-6);
+  border-radius: var(--radius-xl);
+  color: var(--on-brand-light);
+}
+.modeCard[data-tone='ochre'] { background: var(--brand-ochre); }
+.modeCard[data-tone='pink'] { background: var(--brand-pink); }
+.modeCard[data-tone='lavender'] { background: var(--brand-lavender); }
+
+.modeTitle {
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tracking-tight);
+  margin: var(--space-3) 0 var(--space-2);
+}
+
+.modeBody {
+  font-size: var(--fs-body-sm);
+  line-height: var(--lh-normal);
+}
+
+/* ---- limits: cream cards, deliberately lower-key than the coloured ones ---- */
+.limitGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+.limitCard {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+}
+
+.limitIcon {
+  color: var(--accent-text);
+  flex: none;
+  margin-top: 0.15rem;
+}
+
+.limitTitle {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  margin-bottom: var(--space-2);
+  letter-spacing: 0;
+  line-height: var(--lh-snug);
+}
+
+.limitBody {
+  font-size: var(--fs-body-sm);
+  color: var(--text-secondary);
+  line-height: var(--lh-normal);
+}
+
+/* ---- closing CTA band ---- */
+.cta {
+  margin-top: var(--space-8);
+  padding: var(--space-7) var(--space-6);
+  border-radius: var(--radius-xl);
+  background: var(--surface-1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  text-align: center;
+}
+
+.ctaTitle {
+  font-size: var(--fs-h2);
+  max-width: 34rem;
+}
+
+@media (max-width: 1024px) {
+  .steps { grid-template-columns: repeat(2, 1fr); }
+  .modeGrid,
+  .limitGrid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .page { padding: var(--space-6) var(--space-4) var(--space-7); }
+  .steps,
+  .modeGrid,
+  .limitGrid { grid-template-columns: 1fr; }
+}

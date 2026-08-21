@@ -1,0 +1,57 @@
+/* hero-illustration-card, per DESIGN.md: surface-soft fill, xl radius. */
+.frame {
+  background: var(--surface-1);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.svg {
+  width: 100%;
+  height: auto;
+  max-width: 28rem;
+  overflow: visible;
+}
+
+.beamIn {
+  stroke: var(--text-primary);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.prismFill {
+  fill: var(--accent-200);
+}
+
+.prismEdge {
+  fill: none;
+  stroke: var(--text-primary);
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+
+.prismInner {
+  stroke: var(--accent-600);
+  stroke-width: 1.5;
+  opacity: 0.5;
+}
+
+.beamOchre,
+.beamPink,
+.beamLavender {
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+.beamOchre { stroke: var(--brand-ochre); }
+.beamPink { stroke: var(--brand-pink); }
+.beamLavender { stroke: var(--brand-lavender); }
+
+.dotOchre { fill: var(--brand-ochre); }
+.dotPink { fill: var(--brand-pink); }
+.dotLavender { fill: var(--brand-lavender); }
+
+@media (max-width: 900px) {
+  .frame { display: none; } /* hero collapses to one column; type leads */
+}
