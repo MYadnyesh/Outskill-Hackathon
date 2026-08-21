@@ -67,6 +67,36 @@
   gap: var(--space-6);
 }
 
+/* Only shown when the bundled demo dataset stood in for a real transform,
+   which can only happen in a dev build (see src/api/client.js). */
+.demoBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-5);
+  border-radius: var(--radius);
+  background: var(--accent-tint);
+  border: 1px solid var(--accent-border);
+  color: var(--accent-text);
+  font-size: var(--fs-body-sm);
+  line-height: var(--lh-snug);
+}
+
+.demoBanner strong {
+  color: var(--accent-text-strong);
+  font-weight: var(--fw-medium);
+}
+
+.demoBanner code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--fs-caption);
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+}
+
 @media (max-width: 640px) {
   .page { padding: var(--space-4); }
   .summaryCard { flex-direction: column; }

@@ -22,12 +22,30 @@ export const EXAMPLE_URLS = [
   { label: 'a page that will fail (demo)', url: BROKEN_DEMO_URL, isBrokenDemo: true },
 ];
 
-// Must exceed the backend's own worst case, which is FETCH_TIMEOUT_MS (8s,
-// lib/extract.js) + TIMEOUT_MS (20s, lib/gemini.js) = 28s. If this fires first
-// the catch below silently substitutes demo data, so a slow-but-successful
-// transform would show canned "black holes" content for the user's real URL
-// with nothing on screen saying so. Keep this above 28s.
-const REQUEST_TIMEOUT_MS = 30000;
+// Must sit ABOVE the platform's own ceiling (maxDuration: 30s in vercel.json)
+// so the server always loses the race and we receive its real 504 rather than
+// aborting first and having to guess what happened. Keep this > 30s.
+const REQUEST_TIMEOUT_MS = 35000;
+
+// Demo data is a DEV-ONLY convenience. `getDemoResponse()` ignores the URL and
+// always returns the canned "black holes" dataset, so substituting it for a
+// failed real request renders a confident, completely wrong answer — a page
+// about Artificial Intelligence comes back as a NASA black-holes summary with
+// nothing on screen saying so. That is acceptable while building UI with no
+// backend running; it is never acceptable in a deployed build, where a real
+// failure must surface as a real error. import.meta.env.DEV is true for
+// `npm run dev` / `dev:local` and false in any production build.
+const ALLOW_DEMO_FALLBACK = import.meta.env.DEV;
+
+function demoResponse(mode) {
+  // _demo is read by src/screens/Results.jsx to show a visible banner, so even
+  // the legitimate dev-mode fallback is never mistaken for a real result.
+  return { ...getDemoResponse(mode), _demo: true };
+}
+
+function transportError(code, message) {
+  return { status: 'error', code, message };
+}
 
 function brokenDemoError() {
   return {
@@ -62,17 +80,48 @@ export async function analyzeUrl(url, mode) {
     });
     clearTimeout(timeout);
 
-    // A 404 here means there's no /api route at all (plain `vite dev`) —
-    // fall back rather than surfacing a confusing raw 404.
-    if (res.status === 404) {
-      return { ...getDemoResponse(mode), _demo: true };
+    // Parse FIRST, status second. api/analyze.js deliberately pairs real
+    // errors with non-2xx codes (AI_ERROR is a 502, FETCH_FAILED a 502,
+    // INVALID_MODE a 400), so branching on the status code before reading the
+    // body would swallow a perfectly good error envelope and — in dev — replace
+    // a genuine "the AI is down" message with demo data. If it parses and
+    // carries our `status` field, it IS the answer, whatever the code.
+    let payload = null;
+    try {
+      payload = await res.json();
+    } catch {
+      payload = null;
+    }
+    if (payload && (payload.status === 'ok' || payload.status === 'error')) {
+      return payload;
     }
 
-    const data = await res.json();
-    return data;
+    // Past here the body is not our envelope, so this came from the platform
+    // or the dev proxy rather than from the function.
+    if (res.status === 504) {
+      // Vercel killed the invocation at maxDuration.
+      return transportError('TIMEOUT', 'That page took too long to transform. Try a shorter page.');
+    }
+    if (res.status === 404 || res.status === 502 || res.status === 503) {
+      // No route (plain `vite dev`) or the dev proxy's target is down — i.e.
+      // there is no backend at all, which is exactly what demo data is for.
+      if (ALLOW_DEMO_FALLBACK) return demoResponse(mode);
+      return transportError('AI_ERROR', 'The service is unavailable right now. Please try again.');
+    }
+    return transportError('UNKNOWN', 'Got an unreadable response from the server.');
   } catch (err) {
     clearTimeout(timeout);
-    console.warn('[Prism] /api/analyze unreachable, using bundled demo data instead:', err?.message);
-    return { ...getDemoResponse(mode), _demo: true };
+
+    if (err?.name === 'AbortError') {
+      return transportError('TIMEOUT', 'That took too long. Try again, or try a shorter page.');
+    }
+
+    // A genuine network-level failure. In dev that usually just means no
+    // backend is running, which is exactly what demo data is for.
+    if (ALLOW_DEMO_FALLBACK) {
+      console.warn('[Prism] /api/analyze unreachable, using bundled demo data instead:', err?.message);
+      return demoResponse(mode);
+    }
+    return transportError('FETCH_FAILED', 'Could not reach the server. Check your connection and try again.');
   }
 }

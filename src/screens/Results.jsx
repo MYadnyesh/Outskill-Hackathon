@@ -1,3 +1,4 @@
+import { Warning } from '@phosphor-icons/react';
 import { TopNav } from '../design-system/components/index.js';
 import { useAppState } from '../state/AppState.jsx';
 import { SiteSummaryHeader } from './results/SiteSummaryHeader.jsx';
@@ -22,6 +23,17 @@ export function Results({ onOpenLibrary }) {
     <div>
       <TopNav activeScreen="results" onHome={resetToLanding} onLibrary={onOpenLibrary} savedCount={state.library.length} />
       <div className={styles.page}>
+        {/* Demo data ignores the submitted URL entirely (see src/api/client.js),
+            so it must never be mistaken for a real transform of that page. */}
+        {result._demo ? (
+          <div className={styles.demoBanner} role="status">
+            <Warning size={16} weight="fill" aria-hidden="true" />
+            <span>
+              Showing bundled demo content — no backend is running, so this is <strong>not</strong> a
+              transform of the URL you submitted. Run <code>npm run dev:local</code> for real results.
+            </span>
+          </div>
+        ) : null}
         <SiteSummaryHeader site={site} />
         <div className={styles.modeBody}>
           {mode === 'tldr' ? (

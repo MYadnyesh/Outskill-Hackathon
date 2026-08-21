@@ -290,15 +290,33 @@ small time gap between scraping and output generation" — concretely:
   model: it walked past 2 retired + 1 exhausted model and answered in 2.8s
   total, then stuck to the working model for the rest of the process.
   Override with `GEMINI_MODEL` / `GEMINI_MODELS` — see `.env.example`.
-- **Still open:** song mode with real ElevenLabs audio measured **20.7-30.9s**
-  end to end, against a 30s `maxDuration` (`vercel.json`) *and* a 30s
-  `REQUEST_TIMEOUT_MS` (`src/api/client.js`). At the top of that range the
-  function is killed and/or the frontend gives up and silently substitutes
-  demo data — the exact "wrong answer nobody notices" failure this section
-  warns about. The configured worst case is worse still: `8s extract + 20s
-  gemini + 45s elevenlabs = 73s`. Fixing it means moving `maxDuration`,
-  `REQUEST_TIMEOUT_MS` and `lib/elevenlabs.js`'s `TIMEOUT_MS` together
-  (measured ElevenLabs need is only ~15-17s), or halving track length.
+- ~~Song mode's real audio overruns the 30s budget~~ **Done (Aug 21).** It
+  measured 20.7-30.9s against a 30s `maxDuration`, so it intermittently blew
+  the ceiling. Fixed by making the audio step **deadline-aware** rather than by
+  raising limits (which would depend on the Vercel plan): `api/analyze.js`
+  passes `transformSong` a deadline of `started + 30s - 3s margin`,
+  `song.js` gives ElevenLabs only the budget that's actually left, and skips
+  audio entirely below `MIN_AUDIO_BUDGET_MS` (8s). Track length also dropped
+  60s → 30s. Net: **18.5s and 0.61MB**, down from 20.9s/1.22MB. Because audio
+  is already a best-effort step, running out of time now costs the *track*
+  (`audioUrl: null` → simulated player) instead of the whole request —
+  verified by forcing an expired deadline: lyrics survived, audio skipped.
+- ~~Public endpoint is an SSRF vector~~ **Done (Aug 21).** `lib/extract.js`
+  previously fetched any URL whose hostname merely contained a dot. Confirmed
+  by pointing it at a loopback-only service, which it fetched and returned
+  verbatim. Now: non-http(s) schemes rejected, hostnames DNS-resolved and every
+  resolved IP checked against loopback / link-local (incl. `169.254.169.254`
+  cloud metadata) / RFC-1918 / CGNAT / multicast, and redirects followed
+  **manually** so each hop is re-validated — `redirect: 'follow'` let a public
+  URL 302 straight to an internal one. Verified: all internal targets blocked
+  including the redirect bypass, while real URLs (and bare-domain input, and
+  cross-host redirects like `nasa.gov` → `science.nasa.gov`) still work.
+  Note `site.domain` now reports the **final** host after redirects.
+- **Still open — no rate limiting.** `POST /api/analyze` is public,
+  unauthenticated and `Access-Control-Allow-Origin: *`, and every call spends
+  Gemini quota. With 20 requests/day/model, a handful of `curl`s can exhaust
+  the day's budget across all five fallback models. Fine for a private demo;
+  worth an IP-based limit or a shared secret if the URL is posted anywhere.
 
 ## Feature: Design QA & accessibility pass
 
