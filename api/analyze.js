@@ -9,12 +9,13 @@
 //
 // Perf note ("very small time gap between scraping and output"): extraction
 // and the AI call are the only two sequential steps, both have hard timeouts
-// (see lib/extract.js and lib/gemini.js), and song/kid modes skip the AI call
-// entirely until a teammate implements them — they return instantly after
-// extraction so the shared shell is never the slow part.
+// (see lib/extract.js and lib/gemini.js). Song mode skips the AI call entirely
+// until a teammate implements it — it returns instantly after extraction so
+// the shared shell is never the slow part.
 
 import { extractFromUrl, ExtractError } from '../lib/extract.js';
 import { transformTldr } from '../lib/transforms/tldr.js';
+import { transformKid } from '../lib/transforms/kid.js';
 import { GeminiError } from '../lib/gemini.js';
 
 const VALID_MODES = new Set(['tldr', 'song', 'kid']);
@@ -85,9 +86,29 @@ export default async function handler(req, res) {
     }
   }
 
-  // 'song' and 'kid': extraction-only for now. A teammate wires the real
-  // transform in lib/transforms/song.js / kid.js per docs/FEATURES.md, then
-  // adds one `if (mode === 'song') {...}` branch here mirroring the tldr one
+  if (mode === 'kid') {
+    try {
+      const kid = await transformKid(extraction);
+      return res.status(200).json({
+        status: 'ok',
+        mode: 'kid',
+        site,
+        kid,
+        timingMs: { extract: extraction.extractMs, total: Date.now() - started },
+      });
+    } catch (err) {
+      if (err instanceof GeminiError) {
+        console.error('Gemini error (kid):', err.message);
+        return sendError(res, 502, 'AI_ERROR', 'The AI storyteller is unavailable right now.');
+      }
+      console.error('Unexpected kid error:', err);
+      return sendError(res, 500, 'UNKNOWN', 'Something went wrong writing your kid-friendly explanation.');
+    }
+  }
+
+  // 'song': extraction-only for now. A teammate wires the real transform in
+  // lib/transforms/song.js per docs/FEATURES.md, then adds one
+  // `if (mode === 'song') {...}` branch here mirroring the tldr/kid ones
   // above — same shape, same error handling.
   return res.status(200).json({
     status: 'ok',

@@ -8,11 +8,6 @@ const COPY = {
     body: "Make a Song mode is being built next — real AI lyrics from this page, plus a real sung track. The shared shell (extraction, error handling, save/share) already works for it.",
     file: 'lib/transforms/song.js',
   },
-  kid: {
-    title: 'This story is still being written',
-    body: 'Explain It to a Kid mode is being built next — a simple explanation, a short story, fun facts, and a quiz for this page. The shared shell already works for it.',
-    file: 'lib/transforms/kid.js',
-  },
 };
 
 /** Placeholder shown for modes that don't have a real AI transform wired up yet. */
