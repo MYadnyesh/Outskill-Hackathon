@@ -147,6 +147,17 @@ node scripts/test-extract.js    # unit test for HTML parsing
   0-based and in range. **ElevenLabs is still unexercised** — the Music API
   needs a paid plan, so only its no-key fallback (`audioUrl: null`) has been
   confirmed, which is the path that matters most.
+- **Gemini's free tier is capped at 20 requests/day PER MODEL.** This is the
+  single most likely reason a working demo suddenly returns `AI_ERROR` for
+  every mode. `generateJSON()` in `lib/gemini.js` walks a 5-model priority
+  list and advances on 429 (quota) / 404 (retired) / 503 (overloaded), so
+  each fallback buys another 20/day; the walk is nearly free because those
+  rejections return in well under a second. Two deliberate properties worth
+  not "fixing": the 20s timeout is a **total** budget across all attempts
+  (so fallback can never widen the worst case), and request-level failures
+  — a bad schema, a safety block — set `canFallback: false` so they fail
+  fast instead of being retried against all five models. Configure via
+  `GEMINI_MODEL` (preferred model only) or `GEMINI_MODELS` (whole list).
 - `lib/gemini.js`'s default model was `gemini-2.5-flash`; that's now
   retired for new API keys and the default is `gemini-3.6-flash`. That
   model does internal "thinking" by default, which — uncapped — was

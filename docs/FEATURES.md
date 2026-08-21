@@ -281,6 +281,24 @@ small time gap between scraping and output generation" — concretely:
   a paid plan — only its no-key fallback (`audioUrl: null`) is confirmed.
   Watch for transient `503 UNAVAILABLE` from Gemini under load; it surfaces
   as `AI_ERROR` and succeeds on retry.
+- ~~Single hard-coded Gemini model~~ **Done (Aug 21).** The free tier caps
+  `generate_content` at **20 requests per day, per model**, which turned the
+  demo into a dead app after 20 transforms. `lib/gemini.js` now walks a
+  priority list (`gemini-3.6-flash` → `3.5-flash` → `3.7-flash` →
+  `3.1-flash-lite` → `3.5-flash-lite`) and advances on 429/404/503, so each
+  fallback buys another 20/day. Verified live against a genuinely exhausted
+  model: it walked past 2 retired + 1 exhausted model and answered in 2.8s
+  total, then stuck to the working model for the rest of the process.
+  Override with `GEMINI_MODEL` / `GEMINI_MODELS` — see `.env.example`.
+- **Still open:** song mode with real ElevenLabs audio measured **20.7-30.9s**
+  end to end, against a 30s `maxDuration` (`vercel.json`) *and* a 30s
+  `REQUEST_TIMEOUT_MS` (`src/api/client.js`). At the top of that range the
+  function is killed and/or the frontend gives up and silently substitutes
+  demo data — the exact "wrong answer nobody notices" failure this section
+  warns about. The configured worst case is worse still: `8s extract + 20s
+  gemini + 45s elevenlabs = 73s`. Fixing it means moving `maxDuration`,
+  `REQUEST_TIMEOUT_MS` and `lib/elevenlabs.js`'s `TIMEOUT_MS` together
+  (measured ElevenLabs need is only ~15-17s), or halving track length.
 
 ## Feature: Design QA & accessibility pass
 

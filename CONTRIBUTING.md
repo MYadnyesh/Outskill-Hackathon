@@ -106,6 +106,15 @@ everyone else to see what's landed.
   truncating the response. If this recurs on a future model swap, check
   `finishReason` / `usageMetadata.thoughtsTokenCount` in the raw Gemini
   response before assuming your own code broke it.
+- **The Gemini free tier allows only 20 requests per day, per model.** Hit
+  it and every transform returns `AI_ERROR`. `lib/gemini.js` handles this
+  automatically: it walks a 5-model priority list and advances on 429/404/503,
+  so each fallback buys another 20/day. A line like
+  `[Prism] Gemini fell back to gemini-3.5-flash (gemini-3.6-flash unavailable)`
+  in the server log is that working as intended, not a bug — but it does mean
+  the preferred model's daily budget is gone. Override the list with
+  `GEMINI_MODELS` (see `.env.example`) if you need different models. If you
+  exhaust *every* model in the list, you're out until the quota resets.
 - Ping the group chat rather than sitting stuck for more than ~20 minutes
   — the deadline's tight enough that unblocking each other fast matters
   more than everyone independently debugging the same class of issue.
