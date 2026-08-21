@@ -2,6 +2,7 @@ import { TopNav } from '../design-system/components/index.js';
 import { useAppState } from '../state/AppState.jsx';
 import { SiteSummaryHeader } from './results/SiteSummaryHeader.jsx';
 import { TldrContent } from './results/TldrContent.jsx';
+import { SongContent } from './results/SongContent.jsx';
 import { KidContent } from './results/KidContent.jsx';
 import { ComingSoon } from './results/ComingSoon.jsx';
 import styles from './Results.module.css';
@@ -12,13 +13,11 @@ export function Results({ onOpenLibrary }) {
 
   if (!result || result.status !== 'ok') return null;
 
-  const { site, mode, tldr, kid } = result;
+  const { site, mode, tldr, song, kid } = result;
 
-  // TL;DR and Kid mode have real content components — song mode still shows
-  // the shared placeholder here, even when demo/mock data happens to include
-  // full song content (that mock content exists as a reference shape for
-  // whoever builds SongContent, see docs/FEATURES.md — it's not meant to
-  // render until that UI exists).
+  // All three modes have real content components now. ComingSoon is kept
+  // as a defensive fallback only — it should never actually render given
+  // VALID_MODES in api/analyze.js.
   return (
     <div>
       <TopNav activeScreen="results" onHome={resetToLanding} onLibrary={onOpenLibrary} savedCount={state.library.length} />
@@ -27,6 +26,8 @@ export function Results({ onOpenLibrary }) {
         <div className={styles.modeBody}>
           {mode === 'tldr' ? (
             <TldrContent site={site} tldr={tldr} />
+          ) : mode === 'song' ? (
+            <SongContent song={song} />
           ) : mode === 'kid' ? (
             <KidContent kid={kid} />
           ) : (

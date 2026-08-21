@@ -9,12 +9,13 @@
 //
 // Perf note ("very small time gap between scraping and output"): extraction
 // and the AI call are the only two sequential steps, both have hard timeouts
-// (see lib/extract.js and lib/gemini.js). Song mode skips the AI call entirely
-// until a teammate implements it — it returns instantly after extraction so
-// the shared shell is never the slow part.
+// (see lib/extract.js and lib/gemini.js). All three modes call Gemini for
+// real; song mode's ElevenLabs audio call runs after and is best-effort only
+// (see lib/transforms/song.js).
 
 import { extractFromUrl, ExtractError } from '../lib/extract.js';
 import { transformTldr } from '../lib/transforms/tldr.js';
+import { transformSong } from '../lib/transforms/song.js';
 import { transformKid } from '../lib/transforms/kid.js';
 import { GeminiError } from '../lib/gemini.js';
 
@@ -86,6 +87,29 @@ export default async function handler(req, res) {
     }
   }
 
+  if (mode === 'song') {
+    try {
+      // Note: song audio is best-effort inside transformSong — a missing
+      // ELEVENLABS_API_KEY or a failed compose yields audioUrl: null rather
+      // than an error, so only a lyrics (Gemini) failure lands in the catch.
+      const song = await transformSong(extraction);
+      return res.status(200).json({
+        status: 'ok',
+        mode: 'song',
+        site,
+        song,
+        timingMs: { extract: extraction.extractMs, total: Date.now() - started },
+      });
+    } catch (err) {
+      if (err instanceof GeminiError) {
+        console.error('Gemini error (song):', err.message);
+        return sendError(res, 502, 'AI_ERROR', 'The AI songwriter is unavailable right now.');
+      }
+      console.error('Unexpected song error:', err);
+      return sendError(res, 500, 'UNKNOWN', 'Something went wrong writing your song.');
+    }
+  }
+
   if (mode === 'kid') {
     try {
       const kid = await transformKid(extraction);
@@ -105,16 +129,4 @@ export default async function handler(req, res) {
       return sendError(res, 500, 'UNKNOWN', 'Something went wrong writing your kid-friendly explanation.');
     }
   }
-
-  // 'song': extraction-only for now. A teammate wires the real transform in
-  // lib/transforms/song.js per docs/FEATURES.md, then adds one
-  // `if (mode === 'song') {...}` branch here mirroring the tldr/kid ones
-  // above — same shape, same error handling.
-  return res.status(200).json({
-    status: 'ok',
-    mode,
-    site,
-    notImplemented: true,
-    timingMs: { extract: extraction.extractMs, total: Date.now() - started },
-  });
 }

@@ -1,12 +1,17 @@
 # Prism — feature implementation guide
 
-This is the source of truth for what's left to build, exactly how it plugs
-into what already exists, and the data shapes everything must match. If
-you're picking up a feature from here, you shouldn't need to touch anything
-outside the files your section names.
+This is the source of truth for how each feature plugs into what already
+exists, and the data shapes everything must match. If you're picking up a
+feature from here, you shouldn't need to touch anything outside the files
+your section names.
 
 Deadline: **Aug 21**. Ship small, working PRs — a feature at 80% that's
 merged beats a feature at 100% still sitting on your laptop.
+
+> **All three modes are now built.** The Song and Kid sections below are
+> kept as documentation of how those modes work and what their specs were.
+> The genuinely open work is Library polish, backend reliability, and the
+> design/accessibility pass at the end of this file.
 
 ## What's already built (don't rebuild this)
 
@@ -16,8 +21,13 @@ merged beats a feature at 100% still sitting on your laptop.
   all wired to real state.
 - **TL;DR mode**: fully real, end to end — `lib/extract.js` scrapes the
   submitted URL server-side, `lib/transforms/tldr.js` sends it to Gemini,
-  `src/screens/results/TldrContent.jsx` renders it. Use this as the
-  reference pattern for Song and Kid mode.
+  `src/screens/results/TldrContent.jsx` renders it. Still the reference
+  pattern to copy for any new transform.
+- **Song mode**: `lib/transforms/song.js` (Gemini lyrics) +
+  `lib/elevenlabs.js` (optional paid audio, degrades to `audioUrl: null`) +
+  `src/screens/results/SongContent.jsx` and `useSongPlayback.js`.
+- **Kid mode**: `lib/transforms/kid.js` +
+  `src/screens/results/KidContent.jsx`.
 - **Design system**: `src/design-system/` — tokens, base styles, and a
   component kit (`Button`, `Pill`, `Card`, `TextField`, `SegmentedControl`,
   `TopNav`, `SelectableCard`, `IconBadge`, `Divider`). Reuse these; don't
@@ -92,7 +102,23 @@ frontend, the mock data, and everyone's in-progress branches all assume it.
 
 ---
 
-## Feature: Make a Song mode
+## Feature: Make a Song mode — BUILT
+
+Implementation notes on top of the spec below:
+
+- **ElevenLabs returns raw audio bytes**, not a hosted URL (`POST
+  https://api.elevenlabs.io/v1/music`, `xi-api-key` header, body
+  `{ prompt, music_length_ms, model_id }`). Since the contract needs
+  `audioUrl: string|null` and there's no blob storage here,
+  `lib/elevenlabs.js` base64-encodes the bytes into a `data:` URI. Base64
+  inflates ~1.33x against Vercel's ~4.5MB response ceiling, so track length
+  is capped at 60s.
+- The lyrics are inlined into the plain `prompt` field rather than the
+  `composition_plan` object — the plan's nested shape is less stable across
+  API revisions, and fewer moving parts means fewer ways for a best-effort
+  call to break.
+- `useSongPlayback(song)` lives in `src/screens/results/` and owns the
+  real-audio-vs-simulated branch, exactly as specced below.
 
 **Files you'll touch:**
 - `lib/elevenlabs.js` — new file, ElevenLabs Music client (mirror the style
@@ -154,7 +180,7 @@ team's shared one isn't in `.env.local` yet.
 
 ---
 
-## Feature: Explain It to a Kid mode
+## Feature: Explain It to a Kid mode — BUILT
 
 **Files you'll touch:**
 - `lib/transforms/kid.js` — new file, mirror `lib/transforms/tldr.js`.
@@ -231,9 +257,16 @@ small time gap between scraping and output generation" — concretely:
   live demo doesn't re-spend a Gemini call or wait on a real fetch. Note
   serverless functions are not guaranteed to stay warm between requests —
   this is a nice-to-have, not a real cache layer.
-- Double check `FETCH_TIMEOUT_MS` (8s) and Gemini's `TIMEOUT_MS` (12s) in
-  `lib/extract.js` / `lib/gemini.js` are sane once you're seeing real
-  numbers — tune down if real latency is much lower.
+- ~~Double check `FETCH_TIMEOUT_MS` (8s) and Gemini's `TIMEOUT_MS` (12s)~~
+  **Done (Aug 21).** Measured on `en.wikipedia.org/wiki/Black_hole`: song
+  10.4s, kid 11.7s, tldr **exceeded 12s and aborted**, a later tldr run
+  6.8s. Real latency is high *and* variable, so the budget went **up**, not
+  down: `TIMEOUT_MS` 12s → 20s, and `REQUEST_TIMEOUT_MS` in
+  `src/api/client.js` 20s → 30s to match. Those two must move together —
+  if the frontend gives up first it silently swaps in demo data, turning a
+  visible timeout into a wrong answer nobody notices. The chain to respect:
+  `FETCH_TIMEOUT_MS (8s) + TIMEOUT_MS ≤ maxDuration (30s, vercel.json)` and
+  `≤ REQUEST_TIMEOUT_MS`.
 - **Known sandbox limitation**: this project was scaffolded in an
   environment whose outbound network was allowlisted to package registries
   only, so live extraction and live Gemini calls could not be fully
@@ -242,7 +275,12 @@ small time gap between scraping and output generation" — concretely:
   free), and `scripts/test-api.js` exercises the route's error handling.
   Whoever runs this locally with real internet access first should do a
   quick sanity pass against a few real URLs and report back if anything's
-  off.
+  off. **Both have since been done (Aug 21):** real extraction against live
+  URLs works, and all three modes have returned real content from the live
+  Gemini API. The one path still unexercised is **ElevenLabs**, which needs
+  a paid plan — only its no-key fallback (`audioUrl: null`) is confirmed.
+  Watch for transient `503 UNAVAILABLE` from Gemini under load; it surfaces
+  as `AI_ERROR` and succeeds on retry.
 
 ## Feature: Design QA & accessibility pass
 

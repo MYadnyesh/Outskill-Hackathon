@@ -20,12 +20,13 @@ Built for the Outskill Hackathon.
 | Mode | Status |
 |---|---|
 | ⚡ TL;DR | **Live** — real extraction + real Gemini summary |
-| 🎵 Make a Song | In progress — shared shell works, AI transform not wired up yet |
-| 🧸 Explain Like I'm 5 | In progress — shared shell works, AI transform not wired up yet |
+| 🎵 Make a Song | **Live** — real Gemini lyrics; real audio when an ElevenLabs key is set, simulated player otherwise |
+| 🧸 Explain Like I'm 5 | **Live** — real Gemini explanation, story, fun facts, and quiz |
 
 Landing, processing animation, error handling, save/share, and the Library
-all work today for every mode. See [`docs/FEATURES.md`](docs/FEATURES.md)
-for exactly what's left and how to build it.
+all work today for every mode. Remaining work is polish rather than new
+modes — Library affordances, backend reliability, and a design/accessibility
+pass, all specced in [`docs/FEATURES.md`](docs/FEATURES.md).
 
 ## Tech stack
 
@@ -36,9 +37,9 @@ for exactly what's left and how to build it.
   run or host.
 - **AI**: [Google Gemini](https://aistudio.google.com/apikey) (free tier,
   no card) for text — summaries, lyrics, kid explanations, quizzes. Real
-  song *audio* (once built) uses [ElevenLabs Music](https://elevenlabs.io)
-  (paid — see `docs/FEATURES.md#feature-make-a-song-mode`), with a graceful
-  fallback to a simulated player when no key is configured.
+  song *audio* uses [ElevenLabs Music](https://elevenlabs.io) (paid — see
+  `docs/FEATURES.md#feature-make-a-song-mode`), with a graceful fallback to
+  a simulated player when no key is configured.
 - **Icons**: [Phosphor Icons](https://phosphoricons.com/).
 - **Deployment**: [Vercel](https://vercel.com) — static frontend + `/api`
   functions, zero-config.
@@ -81,15 +82,19 @@ Full contributor workflow (branches, PRs, testing) is in
 api/analyze.js          the one backend endpoint (POST url+mode -> result)
 lib/extract.js           real server-side URL scraping (cheerio)
 lib/gemini.js             thin Gemini REST client
-lib/transforms/tldr.js    the one finished AI transform (reference pattern)
+lib/elevenlabs.js         thin ElevenLabs Music client (optional, paid)
+lib/transforms/tldr.js    TL;DR transform (the reference pattern)
+lib/transforms/song.js    lyrics via Gemini + best-effort audio
+lib/transforms/kid.js     explanation, story, fun facts, quiz
 src/design-system/        tokens, base styles, shared component kit
 src/state/AppState.jsx    the whole app's state machine
 src/api/client.js         frontend -> backend, with mock-data fallback
 src/mock/demoData.js      canned "black holes" dataset, all 3 modes
 src/screens/              Landing, Processing, Error, Results, Library
+src/screens/results/      per-mode content components + useSongPlayback
 scripts/test-api.js       local smoke test for api/analyze.js (no CLI needed)
 scripts/test-extract.js   unit test for HTML parsing (no network needed)
-docs/FEATURES.md          what's left to build + exact specs
+docs/FEATURES.md          remaining polish work + exact specs
 ```
 
 ## Design system
@@ -105,8 +110,12 @@ there rather than hardcoding a color or spacing value.
 
 - No accounts, no real persistence beyond the current browser session (the
   Library resets on reload) — matches the hackathon scope.
-- Song and Kid mode show a "coming soon" placeholder until their AI
-  transforms are wired up (see `docs/FEATURES.md`).
+- Song mode's *audio* needs a paid ElevenLabs plan. Without
+  `ELEVENLABS_API_KEY` the lyrics still generate normally and the player
+  falls back to simulated playback (`audioUrl: null`) — it never fails the
+  request. Generated audio is returned as a base64 `data:` URI (the API
+  hands back raw bytes and this project has no blob storage), which is why
+  `lib/elevenlabs.js` caps track length at 60s.
 - Google Fonts (Inter) requires normal internet access to load — it won't
   render in network-restricted sandboxes, only real browsers/deployments.
 - `GEMINI_MODEL` defaults to `gemini-3.6-flash` (see `lib/gemini.js`) —
