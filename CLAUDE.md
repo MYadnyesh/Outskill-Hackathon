@@ -180,6 +180,15 @@ node scripts/test-extract.js    # unit test for HTML parsing
   — a bad schema, a safety block — set `canFallback: false` so they fail
   fast instead of being retried against all five models. Configure via
   `GEMINI_MODEL` (preferred model only) or `GEMINI_MODELS` (whole list).
+- **A slow model is worse than a dead one.** `gemini-3.7-flash` was measured
+  returning 503 after **80 seconds** under load. Because the 20s timeout is a
+  shared budget, one model that slow to refuse starves every fallback behind
+  it. Two things guard against this: `DEFAULT_MODELS` is ordered by *observed
+  reliability* (a fast `-lite` model sits second so a cold start reaches
+  something working in one hop, and 3.7-flash is last), and failures are
+  recorded in a `skipUntil` cooldown map — 10 min for a 429/404, 60s for a
+  503/timeout — so the next request doesn't re-pay the same penalty. Don't
+  reorder that list by nominal capability alone.
 - `lib/gemini.js`'s default model was `gemini-2.5-flash`; that's now
   retired for new API keys and the default is `gemini-3.6-flash`. That
   model does internal "thinking" by default, which — uncapped — was
