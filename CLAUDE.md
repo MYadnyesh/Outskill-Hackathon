@@ -12,10 +12,10 @@ transform of that page. Outskill Hackathon project, team of 5, deadline
 
 ## Read before touching code
 
-- **`docs/FEATURES.md`** — the actual implementation spec for everything
-  not yet built (Song mode, Kid mode, Library polish, backend reliability,
-  design QA). If your task is one of those, the file/data-shape/UI spec is
-  already written there. Don't re-derive it from scratch.
+- **`docs/FEATURES.md`** — the implementation spec. All three modes are now
+  built; what's left there is Library polish, backend reliability, and the
+  design/accessibility pass. The Song and Kid sections are kept as built
+  documentation of how those modes work. Don't re-derive any of it.
 - **`CONTRIBUTING.md`** — branch naming, PR flow, local dev commands.
 - **`README.md`** — project overview, quickstart, Vercel deploy steps.
 
@@ -24,12 +24,16 @@ transform of that page. Outskill Hackathon project, team of 5, deadline
 | Mode | Status |
 |---|---|
 | TL;DR | **Live** — real extraction (`lib/extract.js`) + real Gemini call (`lib/transforms/tldr.js`) |
-| Make a Song | Shared shell only — shows a "coming soon" placeholder. Spec: `docs/FEATURES.md#feature-make-a-song-mode` |
-| Explain Like I'm 5 | Shared shell only — shows a "coming soon" placeholder. Spec: `docs/FEATURES.md#feature-explain-it-to-a-kid-mode` |
+| Make a Song | **Live** — Gemini lyrics (`lib/transforms/song.js`); audio via `lib/elevenlabs.js` when `ELEVENLABS_API_KEY` is set, simulated player otherwise |
+| Explain Like I'm 5 | **Live** — Gemini explanation/story/facts/quiz (`lib/transforms/kid.js`) |
 
-TL;DR is the reference pattern — copy its shape (`lib/transforms/tldr.js`
-+ the `mode === 'tldr'` branch in `api/analyze.js` +
-`src/screens/results/TldrContent.jsx`) when building Song/Kid.
+All three modes are built. TL;DR remains the reference pattern for any new
+transform — copy its shape (`lib/transforms/tldr.js` + the `mode === 'tldr'`
+branch in `api/analyze.js` + `src/screens/results/TldrContent.jsx`).
+
+Remaining work is polish, not new modes: Library affordances, backend
+reliability/caching, and a design + accessibility pass. All specced in
+`docs/FEATURES.md`.
 
 ## Architecture map
 
@@ -37,10 +41,12 @@ TL;DR is the reference pattern — copy its shape (`lib/transforms/tldr.js`
 api/analyze.js              POST url+mode -> result. The ONLY backend endpoint.
 lib/extract.js               real server-side scraping (cheerio), no AI
 lib/gemini.js                 thin Gemini REST client, generateJSON(prompt, schema)
-lib/transforms/tldr.js        the one finished transform — copy this pattern
-lib/transforms/song.js        NOT YET BUILT — see docs/FEATURES.md
-lib/transforms/kid.js         NOT YET BUILT — see docs/FEATURES.md
-lib/elevenlabs.js             NOT YET BUILT — real song audio client
+lib/elevenlabs.js             thin ElevenLabs Music client, composeMusic(...).
+                                Optional + paid; every failure is expected to be
+                                swallowed by song.js into audioUrl: null.
+lib/transforms/tldr.js        the reference transform — copy this pattern
+lib/transforms/song.js        Gemini lyrics + best-effort ElevenLabs audio
+lib/transforms/kid.js         Gemini explanation, story, fun facts, quiz
 
 src/design-system/            tokens.css (colors/type/spacing/shadow), base.css,
                                 components/ (Button, Pill, Card, TextField,
@@ -54,6 +60,10 @@ src/mock/demoData.js          canned "black holes" dataset, all 3 modes,
                                 shaped exactly like a real API response —
                                 use it as your fixture when building UI
 src/screens/                  Landing, Processing, Error, Results, Library
+src/screens/results/          TldrContent / SongContent / KidContent, plus
+                                useSongPlayback.js (owns the real-audio vs
+                                simulated-playback branch so the player UI
+                                doesn't have to care which it's in)
 scripts/test-api.js           smoke test for api/analyze.js, no Vercel CLI needed
 scripts/test-extract.js       unit test for HTML parsing, no network needed
 scripts/dev-server.js         runs api/analyze.js as a plain Node server —
@@ -123,6 +133,20 @@ node scripts/test-extract.js    # unit test for HTML parsing
   free/reliable API that produces real sung vocals from lyrics. This is a
   real cost decision, not an oversight; see `docs/FEATURES.md` for the
   fallback behavior when no key is present.
+- `POST /v1/music` returns **raw audio bytes**, not a hosted URL, but the
+  API contract specifies `audioUrl: string|null`. With no blob storage in
+  this project, `lib/elevenlabs.js` base64-encodes the bytes into a `data:`
+  URI so `audioUrl` stays a plain string an `<audio src>` accepts. Base64
+  inflates ~1.33x and Vercel caps function responses around 4.5MB, which is
+  why track length is capped at 60s. Real blob storage is the right fix if
+  song audio ever becomes more than a demo.
+- All three modes have now been exercised against the **live** Gemini API
+  (Aug 21): real summaries, lyrics and kid explanations all returned and
+  rendered. Kid mode's stricter `responseSchema` (`minItems`/`maxItems`/
+  `minimum`/`maximum`) is accepted by the API, and `correctIndex` came back
+  0-based and in range. **ElevenLabs is still unexercised** — the Music API
+  needs a paid plan, so only its no-key fallback (`audioUrl: null`) has been
+  confirmed, which is the path that matters most.
 - `lib/gemini.js`'s default model was `gemini-2.5-flash`; that's now
   retired for new API keys and the default is `gemini-3.6-flash`. That
   model does internal "thinking" by default, which — uncapped — was
