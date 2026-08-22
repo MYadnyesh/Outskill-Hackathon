@@ -65,12 +65,15 @@
 }
 
 /* ---- team ---- */
-/* auto-fit rather than a fixed column count: the team list grows, and a
-   hard 4-up leaves a lone card stranded on a second row at five people. */
+/* Wide cards laid out horizontally: photo left, text right.
+   A vertical grid stretched every card to match the tallest one, so a single
+   long bio left the others as tall empty boxes. `align-items: start` lets each
+   card size to its own content instead. */
 .teamGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(24rem, 100%), 1fr));
   gap: var(--space-4);
+  align-items: start;
 }
 
 .person {
@@ -78,60 +81,74 @@
   border-radius: var(--radius-lg);
   background: var(--surface-1);
   border: 1px solid var(--border-subtle);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-2);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    'avatar name'
+    'avatar role'
+    'bio    bio'
+    'handle handle';
+  column-gap: var(--space-4);
+  row-gap: var(--space-1);
+  align-content: start;
 }
 
 .avatar {
-  width: 2.75rem;
-  height: 2.75rem;
+  grid-area: avatar;
+  width: 5rem;
+  height: 5rem;
   border-radius: var(--radius-full);
   background: var(--accent-200);
   color: var(--accent-text-strong);
   display: grid;
   place-items: center;
-  font-size: var(--fs-body-lg);
+  font-size: var(--fs-h3);
   font-weight: var(--fw-semibold);
-  margin-bottom: var(--space-2);
+  align-self: center;
 }
 
 .personName {
+  grid-area: name;
   font-size: var(--fs-body-lg);
   font-weight: var(--fw-semibold);
   letter-spacing: 0;
 }
 
 .avatarPhoto {
-  width: 3.5rem;
-  height: 3.5rem;
+  grid-area: avatar;
+  width: 5rem;
+  height: 5rem;
   border-radius: var(--radius-full);
   object-fit: cover;
   background: var(--accent-200);
-  margin-bottom: var(--space-2);
 }
 
 .personBio {
-  font-size: var(--fs-caption);
+  grid-area: bio;
+  margin-top: var(--space-3);
+  font-size: var(--fs-body-sm);
   color: var(--text-muted);
   line-height: var(--lh-normal);
   margin-top: var(--space-2);
 }
 
 .personRole {
+  grid-area: role;
+  align-self: center;
   font-size: var(--fs-body-sm);
   color: var(--text-secondary);
   line-height: var(--lh-snug);
 }
 
 .personHandle {
+  grid-area: handle;
+  justify-self: start;
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
   font-size: var(--fs-caption);
   color: var(--text-muted);
-  margin-top: var(--space-1);
+  margin-top: var(--space-3);
 }
 .personHandle:hover { color: var(--accent-text); }
 

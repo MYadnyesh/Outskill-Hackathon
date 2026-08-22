@@ -33,10 +33,18 @@
   border-color: transparent;
 }
 
+/* The source art is 1600x800 with the button sitting in the middle ~66%;
+   the rest is flat background. JPEG cannot carry transparency, so that band
+   is baked into the pixels. Cropping to 3:1 with object-fit: cover trims it
+   off and lets the button run full-bleed instead of floating in a dark box.
+   If the art is ever re-exported as PNG/WebP with real transparency, drop the
+   aspect-ratio and object-fit and let the image size itself. */
 .art {
   display: block;
   width: 100%;
-  height: auto;
+  aspect-ratio: 3 / 1;
+  object-fit: cover;
+  object-position: center;
   border-radius: var(--radius-lg);
   transition: transform var(--transition-base), filter var(--transition-base);
 }
