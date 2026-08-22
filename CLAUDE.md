@@ -39,7 +39,9 @@ reliability/caching, and a design + accessibility pass. All specced in
 
 ```
 api/analyze.js              POST url+mode -> result. The ONLY backend endpoint.
-lib/extract.js               real server-side scraping (cheerio), no AI
+lib/extract.js               scraping. Firecrawl first (renders JS), cheerio
+                                fallback. EXTRACTOR=cheerio forces the old path
+lib/firecrawl.js              thin Firecrawl scrape client, optional API key
 lib/gemini.js                 thin Gemini REST client, generateJSON(prompt, schema)
 lib/elevenlabs.js             thin ElevenLabs Music client, composeMusic(...).
                                 Optional + paid; every failure is expected to be
@@ -122,7 +124,14 @@ the frontend, the mock data, and every in-progress branch assume it.
   `Results.jsx` shows a banner whenever `_demo` is set. Don't loosen either.
 - **`lib/extract.js` fetches attacker-controlled URLs from inside our network.**
   Keep `assertPublicHost()` on every request *and* every redirect hop, and keep
-  redirects manual — `redirect: 'follow'` silently reintroduces the SSRF.
+  redirects manual — `redirect: 'follow'` silently reintroduces the SSRF. The
+  guard runs on the Firecrawl path too: Firecrawl fetches from its own network
+  rather than ours, but there's no reason to hand it a private address, and the
+  cheerio fallback fetches directly.
+- **Firecrawl is primary, cheerio is the fallback.** A third-party scraper must
+  not become a new way for the app to break: any Firecrawl failure (down,
+  rate-limited, slow) falls through to the direct-fetch path, and the whole of
+  extraction stays inside `EXTRACT_BUDGET_MS` so the Gemini budget is untouched.
 
 ## Commands
 
