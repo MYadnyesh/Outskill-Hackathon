@@ -1,39 +1,84 @@
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
   align-items: flex-start;
   text-align: left;
   padding: var(--space-6);
-  border-radius: var(--radius-xl); /* feature-card radius, per DESIGN.md */
+  border-radius: var(--radius-xl);
   border: 1px solid var(--border);
   background: var(--surface-1);
-  transition: border-color var(--transition-fast), background-color var(--transition-fast);
   width: 100%;
+  transition: transform var(--transition-base), box-shadow var(--transition-base),
+    border-color var(--transition-fast), background-color var(--transition-fast);
 }
 
 .card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
   border-color: var(--border-strong);
 }
 
-/* Selected card fills with its brand tone — the saturated card IS the
-   selection signal, exactly as DESIGN.md uses colour for the featured tier.
-   Text flips to ink on all five tones we use (white on this pink is only
-   3.14:1, so ink is used there too). */
-.selected {
+.card:active {
+  transform: translateY(-1px);
+}
+
+/* Artwork variant: the image is the button face, so the card gets out of its
+   way — no padding on the sides, no competing fill. */
+.cardArt {
+  padding: var(--space-3);
+  align-items: stretch;
+  background: transparent;
+  border-color: transparent;
+}
+
+.art {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-lg);
+  transition: transform var(--transition-base), filter var(--transition-base);
+}
+
+.cardArt:hover .art {
+  transform: scale(1.02) rotate(-0.4deg);
+  filter: saturate(1.06);
+}
+
+/* Selected: lift and ring rather than a colour fill, which the artwork
+   already provides. */
+.cardArt.selected {
+  border-color: var(--accent-border);
+  background: var(--accent-tint);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+.cardArt.selected .art {
+  animation: artPop var(--transition-slow) var(--ease-standard);
+}
+
+@keyframes artPop {
+  0% { transform: scale(0.97); }
+  60% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+/* Icon/text fallback keeps the original saturated-tone selection. */
+.card.selected:not(.cardArt) {
   border-color: transparent;
   color: var(--on-brand-light);
 }
-.selected[data-tone='ochre']    { background: var(--brand-ochre); }
-.selected[data-tone='pink']     { background: var(--brand-pink); }
-.selected[data-tone='lavender'] { background: var(--brand-lavender); }
-.selected[data-tone='peach']    { background: var(--brand-peach); }
-.selected[data-tone='mint']     { background: var(--brand-mint); }
+.card.selected:not(.cardArt)[data-tone='ochre'] { background: var(--brand-ochre); }
+.card.selected:not(.cardArt)[data-tone='pink'] { background: var(--brand-pink); }
+.card.selected:not(.cardArt)[data-tone='lavender'] { background: var(--brand-lavender); }
+.card.selected:not(.cardArt)[data-tone='peach'] { background: var(--brand-peach); }
+.card.selected:not(.cardArt)[data-tone='mint'] { background: var(--brand-mint); }
 
-.selected .title,
-.selected .desc,
-.selected .icon,
-.selected .check {
+.card.selected:not(.cardArt) .title,
+.card.selected:not(.cardArt) .desc,
+.card.selected:not(.cardArt) .icon,
+.card.selected:not(.cardArt) .check {
   color: var(--on-brand-light);
 }
 
@@ -50,13 +95,15 @@
 }
 
 .check {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
   color: var(--accent-text-strong);
-  flex: none;
 }
 
 .title {
   font-family: var(--font-heading);
-  font-weight: var(--fw-semibold); /* card title: Inter 18 / 600 */
+  font-weight: var(--fw-semibold);
   font-size: var(--fs-body-lg);
   color: var(--text-primary);
 }
@@ -65,4 +112,16 @@
   font-size: var(--fs-body-sm);
   color: var(--text-secondary);
   line-height: var(--lh-snug);
+  padding: 0 var(--space-2);
+}
+
+/* Motion is decoration here — the selected ring carries the meaning. */
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .art { transition: none; }
+  .card:hover,
+  .card:active,
+  .cardArt.selected { transform: none; }
+  .cardArt:hover .art { transform: none; }
+  .cardArt.selected .art { animation: none; }
 }

@@ -12,6 +12,7 @@ const MODES = [
   {
     id: 'tldr',
     icon: Lightning,
+    art: '/modes/tldr.png',
     tone: 'ochre',
     title: 'TL;DR',
     description: 'Get the important stuff in seconds.',
@@ -19,6 +20,7 @@ const MODES = [
   {
     id: 'song',
     icon: MusicNotes,
+    art: '/modes/song.png',
     tone: 'pink',
     title: 'Make a Song',
     description: 'Turn knowledge into something you can sing.',
@@ -26,6 +28,7 @@ const MODES = [
   {
     id: 'kid',
     icon: BookOpen,
+    art: '/modes/kid.png',
     tone: 'lavender',
     title: "Explain Like I'm 5",
     description: 'Turn complicated ideas into something kids can understand.',
@@ -46,15 +49,23 @@ export function Landing({ onOpenLibrary, onHowItWorks, onAbout }) {
     startTransform(value, state.selectedMode);
   };
 
+  // Fills the field instead of submitting: the flow is input -> mode ->
+  // proceed, and a chip that ran the whole transform would skip two steps.
   const handleChipClick = (example) => {
     setInputValue(example.url);
-    startTransform(example.url, state.selectedMode);
+    setTouched(false);
   };
 
   return (
     <div>
       <TopNav activeScreen="landing" onHowItWorks={onHowItWorks} onAbout={onAbout} onHome={() => {}} onLibrary={onOpenLibrary} savedCount={state.library.length} />
       <div className={styles.page}>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            submit();
+          }}
+        >
         <div className={styles.hero}>
           <div className={styles.heroCopy}>
           <div className={styles.kicker}>One URL. Three ways to understand it.</div>
@@ -63,53 +74,52 @@ export function Landing({ onOpenLibrary, onHowItWorks, onAbout }) {
             Turn any webpage into a quick summary, a song, or a story made for curious minds.
           </p>
 
-          <form
-            className={styles.form}
-            onSubmit={(e) => {
-              e.preventDefault();
-              submit();
-            }}
-          >
-            <TextField
-              className={styles.field}
-              placeholder="Paste a website URL…"
-              value={inputValue}
-              onChange={(e) => {
-                setInputValue(e.target.value);
-                if (touched) setTouched(false);
-              }}
-              aria-label="Website URL"
-            />
-            <Button type="submit" variant="primary" icon={<ArrowRight size={18} weight="bold" />}>
-              Transform Website
-            </Button>
-          </form>
-          <div className={styles.errorHint}>{touched ? 'Paste a URL to get started.' : ''}</div>
-
-          <div className={styles.chipsRow}>
-            {EXAMPLE_URLS.map((example) => (
-              <button
-                key={example.url}
-                type="button"
-                className={styles.chip}
-                onClick={() => handleChipClick(example)}
-              >
-                {example.label}
-              </button>
-            ))}
+          <div className={styles.step}>
+            <span className={styles.stepNum} aria-hidden="true">1</span>
+            <div className={styles.stepBody}>
+              <label className={styles.stepLabel} htmlFor="prism-url">Paste a link</label>
+              <TextField
+                id="prism-url"
+                className={styles.field}
+                placeholder="Paste a website URL…"
+                value={inputValue}
+                onChange={(e) => {
+                  setInputValue(e.target.value);
+                  if (touched) setTouched(false);
+                }}
+                aria-label="Website URL"
+              />
+              <div className={styles.errorHint}>{touched ? 'Paste a URL to get started.' : ''}</div>
+              <div className={styles.chipsRow}>
+                {EXAMPLE_URLS.map((example) => (
+                  <button
+                    key={example.url}
+                    type="button"
+                    className={styles.chip}
+                    onClick={() => handleChipClick(example)}
+                  >
+                    {example.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
           </div>
 
           <HeroArtifact />
         </div>
 
-        <div className={styles.modeLabel}>Pick how you want to experience it</div>
-        <div className={styles.modeGrid} role="radiogroup" aria-label="Transformation mode">
+        <div className={styles.step}>
+          <span className={styles.stepNum} aria-hidden="true">2</span>
+          <div className={styles.stepBody}>
+            <span className={styles.stepLabel} id="mode-label">Pick what to make of it</span>
+        <div className={styles.modeGrid} role="radiogroup" aria-labelledby="mode-label">
           {MODES.map((mode) => (
             <SelectableCard
               key={mode.id}
               name="mode"
               icon={mode.icon}
+              art={mode.art}
               tone={mode.tone}
               title={mode.title}
               description={mode.description}
@@ -117,7 +127,19 @@ export function Landing({ onOpenLibrary, onHowItWorks, onAbout }) {
               onSelect={() => setSelectedMode(mode.id)}
             />
           ))}
+          </div>
+          </div>
         </div>
+
+        <div className={styles.step}>
+          <span className={styles.stepNum} aria-hidden="true">3</span>
+          <div className={styles.stepBody}>
+            <Button type="submit" variant="primary" size="lg" icon={<ArrowRight size={18} weight="bold" />}>
+              Transform Website
+            </Button>
+          </div>
+        </div>
+        </form>
       </div>
     </div>
   );

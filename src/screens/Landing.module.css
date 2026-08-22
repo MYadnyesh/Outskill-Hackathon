@@ -95,6 +95,46 @@
   border-color: var(--border-strong);
   background: var(--surface-2);
 }
+/* ---- numbered steps: input -> choose -> proceed ---- */
+.step {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+  padding-top: var(--space-6);
+}
+
+.stepNum {
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-full);
+  background: var(--primary);
+  color: var(--on-primary);
+  display: grid;
+  place-items: center;
+  font-size: var(--fs-body-sm);
+  font-weight: var(--fw-semibold);
+  margin-top: 0.1rem;
+}
+
+.stepBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.stepLabel {
+  display: block;
+  font-size: var(--fs-body-lg);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-3);
+}
+
+/* Step 1 sits inside the hero column, so it shouldn't add hero padding. */
+.heroCopy .step {
+  padding-top: var(--space-5);
+}
+
 .modeLabel {
   font-size: var(--fs-caption);
   font-weight: var(--fw-medium);
@@ -107,6 +147,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-4);
+  align-items: start;
 }
 
 .modeSection {

@@ -98,3 +98,10 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* Size variant for a page's terminal action — step 3 on the landing flow. */
+.lg {
+  height: 3.25rem;
+  padding: 0 var(--space-6);
+  font-size: var(--fs-body);
+}

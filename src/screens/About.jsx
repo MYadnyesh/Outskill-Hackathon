@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { GithubLogo, Function as FnIcon, Palette, Robot, MusicNotes, Wrench } from '@phosphor-icons/react';
 import { TopNav, Button, Pill } from '../design-system/components/index.js';
 import { useAppState } from '../state/AppState.jsx';
@@ -5,14 +6,39 @@ import styles from './About.module.css';
 
 const REPO_URL = 'https://github.com/MYadnyesh/Outskill-Hackathon';
 
-// Contributors verified from the repository's own commit history. Add the rest
-// of the team here — `name` and `role` are all that's required.
+// `name` and `role` are required; `photo`, `bio` and `handle` are optional.
+// A missing or broken photo falls back to the initial-letter avatar, so the
+// grid never breaks on an asset that hasn't been added yet.
+// Photos go in public/team/ — see the README there for the expected filenames.
 const TEAM = [
-  { name: 'Yadnyesh M', role: 'Project lead · backend & AI pipeline', handle: 'MYadnyesh' },
-  { name: 'Danica', role: 'Song and Kid modes · docs', handle: 'danicat-dotcom' },
-  { name: 'Ari', role: 'Concept & brainstorming' },
-  { name: 'Indronil', role: 'Concept & brainstorming' },
-  { name: 'Celine', role: 'Concept & brainstorming' },
+  {
+    name: 'Yadnyesh M',
+    role: 'Project lead · backend & AI pipeline',
+    handle: 'MYadnyesh',
+    photo: '/team/yadnyesh.jpg',
+  },
+  {
+    name: 'Danica',
+    role: 'Song and Kid modes · docs',
+    handle: 'danicat-dotcom',
+    photo: '/team/danica.jpg',
+  },
+  {
+    name: 'Ari',
+    role: 'Concept & brainstorming',
+    photo: '/team/ari.jpg',
+    bio: 'A seasoned educator who champions win-win-win university–industry collaboration and works to push societies forward by making ICT, AI and automation more sustainable. An established IEEE Senior Member whose research interests span digitalization, sustainability in societies, and modern creative technologies, with 20+ years contributing to education development.',
+  },
+  {
+    name: 'Indronil',
+    role: 'Concept & brainstorming',
+    photo: '/team/indronil.jpg',
+  },
+  {
+    name: 'Celine',
+    role: 'Concept & brainstorming',
+    photo: '/team/celine.jpg',
+  },
 ];
 
 // Everything here is actually in package.json or lib/. Versions are the ranges
@@ -75,6 +101,27 @@ const PRINCIPLES = [
   },
 ];
 
+/** Photo if one is present and loads; the initial letter otherwise. */
+function TeamAvatar({ name, photo }) {
+  const [failed, setFailed] = useState(false);
+  if (photo && !failed) {
+    return (
+      <img
+        className={styles.avatarPhoto}
+        src={photo}
+        alt=""
+        loading="lazy"
+        onError={() => setFailed(true)}
+      />
+    );
+  }
+  return (
+    <div className={styles.avatar} aria-hidden="true">
+      {name.charAt(0)}
+    </div>
+  );
+}
+
 export function About({ onOpenLibrary, onHowItWorks, onStart }) {
   const { state, resetToLanding, goToScreen } = useAppState();
 
@@ -113,11 +160,12 @@ export function About({ onOpenLibrary, onHowItWorks, onStart }) {
             Built for the Outskill Hackathon.
           </p>
           <div className={styles.teamGrid}>
-            {TEAM.map(({ name, role, handle }) => (
+            {TEAM.map(({ name, role, handle, photo, bio }) => (
               <article key={name} className={styles.person}>
-                <div className={styles.avatar} aria-hidden="true">{name.charAt(0)}</div>
+                <TeamAvatar name={name} photo={photo} />
                 <h3 className={styles.personName}>{name}</h3>
                 <p className={styles.personRole}>{role}</p>
+                {bio ? <p className={styles.personBio}>{bio}</p> : null}
                 {handle ? (
                   <a
                     className={styles.personHandle}
