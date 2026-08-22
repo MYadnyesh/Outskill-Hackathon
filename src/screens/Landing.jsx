@@ -73,40 +73,41 @@ export function Landing({ onOpenLibrary, onHowItWorks, onAbout }) {
           <p className={styles.subhead}>
             Turn any webpage into a quick summary, a song, or a story made for curious minds.
           </p>
-
-          <div className={styles.step}>
-            <span className={styles.stepNum} aria-hidden="true">1</span>
-            <div className={styles.stepBody}>
-              <label className={styles.stepLabel} htmlFor="prism-url">Paste a link</label>
-              <TextField
-                id="prism-url"
-                className={styles.field}
-                placeholder="Paste a website URL…"
-                value={inputValue}
-                onChange={(e) => {
-                  setInputValue(e.target.value);
-                  if (touched) setTouched(false);
-                }}
-                aria-label="Website URL"
-              />
-              <div className={styles.errorHint}>{touched ? 'Paste a URL to get started.' : ''}</div>
-              <div className={styles.chipsRow}>
-                {EXAMPLE_URLS.map((example) => (
-                  <button
-                    key={example.url}
-                    type="button"
-                    className={styles.chip}
-                    onClick={() => handleChipClick(example)}
-                  >
-                    {example.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
           </div>
 
           <HeroArtifact />
+        </div>
+
+        <div className={styles.steps}>
+        <div className={styles.step}>
+          <span className={styles.stepNum} aria-hidden="true">1</span>
+          <div className={styles.stepBody}>
+            <label className={styles.stepLabel} htmlFor="prism-url">Paste a link</label>
+            <TextField
+              id="prism-url"
+              className={styles.field}
+              placeholder="Paste a website URL…"
+              value={inputValue}
+              onChange={(e) => {
+                setInputValue(e.target.value);
+                if (touched) setTouched(false);
+              }}
+              aria-label="Website URL"
+            />
+            <div className={styles.errorHint}>{touched ? 'Paste a URL to get started.' : ''}</div>
+            <div className={styles.chipsRow}>
+              {EXAMPLE_URLS.map((example) => (
+                <button
+                  key={example.url}
+                  type="button"
+                  className={styles.chip}
+                  onClick={() => handleChipClick(example)}
+                >
+                  {example.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         <div className={styles.step}>
@@ -138,6 +139,7 @@ export function Landing({ onOpenLibrary, onHowItWorks, onAbout }) {
               Transform Website
             </Button>
           </div>
+        </div>
         </div>
         </form>
       </div>
