@@ -123,14 +123,40 @@
   background: var(--accent-200);
 }
 
-.personBio {
+.bioBlock {
   grid-area: bio;
   margin-top: var(--space-3);
-  font-size: var(--fs-body-sm);
-  color: var(--text-muted);
-  line-height: var(--lh-normal);
-  margin-top: var(--space-2);
 }
+
+/* Clamped to four lines so one long bio can't set the height of the whole
+   row; the toggle below reveals the rest in place. */
+.personBio {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: var(--fs-body-sm);
+  color: var(--text-secondary);
+  line-height: var(--lh-normal);
+}
+
+.personBioOpen {
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  overflow: visible;
+}
+
+.bioToggle {
+  margin-top: var(--space-2);
+  padding: 0;
+  font-size: var(--fs-body-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--accent-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.bioToggle:hover { color: var(--accent-text-strong); }
 
 .personRole {
   grid-area: role;
