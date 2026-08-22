@@ -19,10 +19,11 @@ const TEAM = [
     bio: 'India-based full stack developer with 2+ years of hands-on experience building scalable, high-performance web applications that balance clean architecture, usability and long-term maintainability. Enjoys owning features end to end — from designing intuitive frontend interfaces to building secure backend APIs and supporting cloud deployments.',
   },
   {
-    name: 'Danica',
-    role: 'Song and Kid modes · docs',
+    name: 'Danica T',
+    role: 'Systems & workflow · Song and Kid modes',
     handle: 'danicat-dotcom',
     photo: '/team/danica.jpg',
+    bio: 'Systems, workflow and AI in tourism. Based in New Zealand.',
   },
   {
     name: 'Ari',
