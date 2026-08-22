@@ -69,7 +69,7 @@
    hard 4-up leaves a lone card stranded on a second row at five people. */
 .teamGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
   gap: var(--space-4);
 }
 
@@ -101,6 +101,22 @@
   font-size: var(--fs-body-lg);
   font-weight: var(--fw-semibold);
   letter-spacing: 0;
+}
+
+.avatarPhoto {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  background: var(--accent-200);
+  margin-bottom: var(--space-2);
+}
+
+.personBio {
+  font-size: var(--fs-caption);
+  color: var(--text-muted);
+  line-height: var(--lh-normal);
+  margin-top: var(--space-2);
 }
 
 .personRole {
