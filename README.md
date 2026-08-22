@@ -64,17 +64,32 @@ card required.
 Full contributor workflow (branches, PRs, testing) is in
 [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
-## Deploying to Vercel
+## Deploying
 
-1. Push this repo to GitHub (already done if you're reading this from the
-   repo).
-2. Go to https://vercel.com/new, import the GitHub repo. Vercel
-   auto-detects Vite — no config needed beyond the defaults.
-3. Under **Project Settings → Environment Variables**, add `GEMINI_API_KEY`
-   (and `ELEVENLABS_API_KEY` once Song mode needs it). These are separate
-   from your local `.env.local` — Vercel doesn't read that file.
-4. Deploy. Every push to `main` auto-deploys after that; every PR gets its
-   own preview URL.
+**Netlify is the primary target.** Its synchronous functions get a fixed
+**60 seconds on every plan**, including the free one. Song mode takes 12–17s
+end to end, and Vercel's ceiling depends on the plan — it can be as low as 10s,
+which would fail every song request. Netlify removes that variable.
+
+1. Push this repo to GitHub (already done if you're reading this from the repo).
+2. Go to https://app.netlify.com/start and import it. `netlify.toml` already
+   sets the build (`npm run build`) and publish directory (`dist`), so there's
+   nothing to configure.
+3. Under **Site configuration → Environment variables**, add `GEMINI_API_KEY`
+   (plus `ELEVENLABS_API_KEY` for real song audio and `FIRECRAWL_API_KEY` for
+   higher scrape limits). These are separate from your local `.env.local` —
+   Netlify doesn't read that file.
+4. Deploy. Every push to `main` auto-deploys; every PR gets a deploy preview.
+
+`POST /api/analyze` is served by `netlify/functions/analyze.mjs`, which routes
+itself with `export const config = { path: '/api/analyze' }` — no redirect
+rules involved.
+
+### Vercel still works
+`vercel.json` and `api/analyze.js` are untouched, so the project deploys to
+Vercel unchanged — the Netlify function is a thin adapter around the same
+handler. If you go that route, check **Settings → Functions** for the duration
+cap first: below 30s, song mode will time out.
 
 ## Project structure
 

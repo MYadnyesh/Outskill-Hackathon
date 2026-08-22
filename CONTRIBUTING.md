@@ -29,10 +29,13 @@ Three ways, pick based on what you're working on:
   `api/analyze.js` directly) alongside Vite, wired together by the `/api`
   proxy in `vite.config.js`. Reads secrets from `.env.local`, no CLI login
   required — this is the easiest way to hit real Gemini locally.
-- **Full end-to-end work with Vercel-exact behavior**: `npm run dev:full`
-  (runs `vercel dev`). First time, this walks you through logging into a
-  Vercel account via the CLI. Prefer `dev:local` unless you specifically
-  need to reproduce Vercel's own runtime.
+- **Closest match to production**: `npm run dev:netlify` (runs `netlify dev`).
+  Serves the Vite app and the real Netlify Function together on
+  http://localhost:8888, routing `/api/analyze` exactly as the deploy does.
+  Needs no login. This is the one to use before shipping anything that touches
+  the endpoint.
+- **Vercel-exact behavior**: `npm run dev:full` (runs `vercel dev`). The
+  project still deploys to Vercel unchanged; this reproduces that runtime.
 
 Before opening a PR that touches `/api` or `/lib`, run:
 ```bash
@@ -44,8 +47,8 @@ npm run build           # make sure the production build doesn't break
 ## Branches
 
 - `main` is the deployed branch — every push to `main` auto-deploys on
-  Vercel once it's connected (see README for the one-time Vercel import
-  step). Don't push straight to `main`.
+  Netlify once it's connected (see README for the one-time import step).
+  Don't push straight to `main`.
 - Branch per feature, off `main`:
   ```bash
   git checkout main && git pull
@@ -78,9 +81,9 @@ everyone else to see what's landed.
 ## Pull requests
 
 1. Push your branch, open a PR into `main`.
-2. Vercel will comment on the PR with a preview deployment link once the
-   repo's connected (ask whoever set up Vercel if you don't see one) — use
-   it to sanity-check on a real deployed URL, not just localhost.
+2. Netlify will comment on the PR with a deploy preview link once the repo's
+   connected (ask whoever set it up if you don't see one) — use it to
+   sanity-check on a real deployed URL, not just localhost.
 3. One other person reviews before merge if you can get someone — for a
    hackathon deadline, a quick "looks reasonable, doesn't break the build"
    is enough, this isn't a production review bar.
@@ -94,7 +97,7 @@ everyone else to see what's landed.
   If your response payload for reference: `demoTldr` / `demoSong` /
   `demoKid` in `src/mock/demoData.js` is the shape to match.
 - If Gemini calls are failing, first check `.env.local` has
-  `GEMINI_API_KEY` set and `npm run dev:local` or `npm run dev:full` (not
+  `GEMINI_API_KEY` set and `npm run dev:local` or `npm run dev:netlify` (not
   plain `npm run dev`) is what's running — plain Vite never reaches the
   real API.
 - If Gemini errors with a 404 on the model name, or with "malformed JSON"
