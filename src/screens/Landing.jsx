@@ -91,7 +91,7 @@ export function Landing({ onOpenLibrary, onHowItWorks, onAbout }) {
               <button
                 key={example.url}
                 type="button"
-                className={[styles.chip, example.isBrokenDemo ? styles.chipBroken : ''].join(' ')}
+                className={styles.chip}
                 onClick={() => handleChipClick(example)}
               >
                 {example.label}

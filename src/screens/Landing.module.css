@@ -95,10 +95,6 @@
   border-color: var(--border-strong);
   background: var(--surface-2);
 }
-.chipBroken {
-  border-style: dashed;
-}
-
 .modeLabel {
   font-size: var(--fs-caption);
   font-weight: var(--fw-medium);

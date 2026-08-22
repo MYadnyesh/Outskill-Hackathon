@@ -14,12 +14,10 @@
 
 import { getDemoResponse, DEMO_URL } from '../mock/demoData.js';
 
-export const BROKEN_DEMO_URL = 'https://this-page-does-not-exist.prism-demo.invalid';
 export const EXAMPLE_URLS = [
   { label: 'nasa.gov — Black Holes', url: DEMO_URL },
   { label: 'wikipedia.org — Artificial Intelligence', url: 'https://en.wikipedia.org/wiki/Artificial_intelligence' },
   { label: 'openai.com — Blog', url: 'https://openai.com/blog' },
-  { label: 'a page that will fail (demo)', url: BROKEN_DEMO_URL, isBrokenDemo: true },
 ];
 
 // Must sit ABOVE the platform's own ceiling (maxDuration: 30s in vercel.json)
@@ -47,27 +45,12 @@ function transportError(code, message) {
   return { status: 'error', code, message };
 }
 
-function brokenDemoError() {
-  return {
-    status: 'error',
-    code: 'FETCH_FAILED',
-    message: 'The link might be broken, private, or blocking automated readers.',
-  };
-}
-
 /**
  * @param {string} url
  * @param {'tldr'|'song'|'kid'} mode
  * @returns {Promise<object>} a response shaped per docs/FEATURES.md#api-contract
  */
 export async function analyzeUrl(url, mode) {
-  // The "broken" example chip is deliberately a non-resolving domain
-  // (.invalid TLD), so it fails for real against the live backend too —
-  // this also short-circuits it in demo/offline mode for the same result.
-  if (url?.trim() === BROKEN_DEMO_URL) {
-    return brokenDemoError();
-  }
-
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
