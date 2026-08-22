@@ -39,6 +39,11 @@ reliability/caching, and a design + accessibility pass. All specced in
 
 ```
 api/analyze.js              POST url+mode -> result. The ONLY backend endpoint.
+                              Written to the Vercel (req,res) signature; the
+                              Netlify function and scripts/dev-server.js both
+                              adapt it rather than forking it.
+netlify/functions/analyze.mjs Netlify v2 adapter. Routes itself to /api/analyze
+                              via `export const config = { path }`.
 lib/extract.js               real server-side scraping (cheerio), no AI
 lib/gemini.js                 thin Gemini REST client, generateJSON(prompt, schema)
 lib/elevenlabs.js             thin ElevenLabs Music client, composeMusic(...).
@@ -112,6 +117,12 @@ the frontend, the mock data, and every in-progress branch assume it.
   `ELEVENLABS_API_KEY` is unset or the call fails, return `audioUrl: null`
   — never throw. The player UI is required to fall back to a simulated
   player either way.
+- **Deploy target is Netlify**, because its synchronous functions get a fixed
+  60s on every plan while Vercel's ceiling is plan-dependent and can be 10s —
+  song mode takes 12-17s. `api/analyze.js` stays host-agnostic so all three
+  runners (Netlify, Vercel, local) share one implementation; if you change the
+  handler's signature you must update `netlify/functions/analyze.mjs` and
+  `scripts/dev-server.js` with it.
 - **Never commit `.env.local`** or real API keys. `.env.example` documents
   what's needed.
 - **Demo data must never stand in for a failed real request in a deployed
@@ -131,8 +142,9 @@ npm install
 cp .env.example .env.local      # add GEMINI_API_KEY (free, no card: aistudio.google.com/apikey)
 
 npm run dev                     # Vite only, no backend, mock data — UI work, no keys needed
-npm run dev:local               # real /api (scripts/dev-server.js) + real frontend, no Vercel account
-npm run dev:full                # vercel dev — same, but via the actual Vercel CLI (needs a login)
+npm run dev:local               # real /api (scripts/dev-server.js) + real frontend, no account needed
+npm run dev:netlify             # netlify dev — closest match to the deployed target
+npm run dev:full                # vercel dev — the Vercel equivalent (needs a login)
 
 npm run build                   # production build, must stay clean
 npm run test:api                # smoke-tests api/analyze.js directly

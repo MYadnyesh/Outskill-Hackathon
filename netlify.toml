@@ -1,0 +1,18 @@
+# Netlify deployment config.
+#
+# The Vite build is static; the one backend endpoint runs as a Netlify
+# Function. api/analyze.js stays the single implementation — the function in
+# netlify/functions/analyze.mjs is a thin adapter around it, so this repo can
+# still deploy to Vercel (vercel.json) or run locally (scripts/dev-server.js)
+# without any code diverging.
+#
+# No redirect rule is needed for /api/analyze: the function declares its own
+# route via `export const config = { path }`.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"

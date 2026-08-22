@@ -3,11 +3,12 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Prism — One URL. Three ways to understand it. (Outskill Hackathon)",
+  "description": "Prism \u2014 One URL. Three ways to understand it. (Outskill Hackathon)",
   "scripts": {
     "dev": "vite",
     "dev:api": "node scripts/dev-server.js",
     "dev:local": "concurrently -n api,web -c blue,green \"npm:dev:api\" \"npm:dev\"",
+    "dev:netlify": "netlify dev",
     "dev:full": "vercel dev",
     "build": "vite build",
     "lint": "oxlint",
