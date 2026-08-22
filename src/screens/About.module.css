@@ -65,9 +65,11 @@
 }
 
 /* ---- team ---- */
+/* auto-fit rather than a fixed column count: the team list grows, and a
+   hard 4-up leaves a lone card stranded on a second row at five people. */
 .teamGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
   gap: var(--space-4);
 }
 
@@ -222,13 +224,11 @@
 .ctaBody { color: var(--text-secondary); max-width: 34rem; }
 
 @media (max-width: 1024px) {
-  .teamGrid,
   .stackGrid { grid-template-columns: repeat(2, 1fr); }
   .principleGrid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 640px) {
   .page { padding: var(--space-6) var(--space-4) var(--space-7); }
-  .teamGrid,
   .stackGrid { grid-template-columns: 1fr; }
 }

@@ -10,6 +10,9 @@ const REPO_URL = 'https://github.com/MYadnyesh/Outskill-Hackathon';
 const TEAM = [
   { name: 'Yadnyesh M', role: 'Project lead · backend & AI pipeline', handle: 'MYadnyesh' },
   { name: 'Danica', role: 'Song and Kid modes · docs', handle: 'danicat-dotcom' },
+  { name: 'Ari', role: 'Concept & brainstorming' },
+  { name: 'Indronil', role: 'Concept & brainstorming' },
+  { name: 'Celine', role: 'Concept & brainstorming' },
 ];
 
 // Everything here is actually in package.json or lib/. Versions are the ranges
@@ -31,8 +34,9 @@ const STACK = [
     icon: FnIcon,
     area: 'Backend',
     items: [
-      ['Vercel Functions', 'One endpoint: POST /api/analyze'],
-      ['cheerio', 'Server-side HTML parsing, no browser needed'],
+      ['Netlify Functions', 'One endpoint: POST /api/analyze'],
+      ['Firecrawl', 'Renders the page first, so JavaScript-built sites are readable'],
+      ['cheerio', 'The local fallback when Firecrawl is unavailable'],
       ['Node fetch + AbortController', 'Hard timeouts and manual redirect checking'],
     ],
   },
