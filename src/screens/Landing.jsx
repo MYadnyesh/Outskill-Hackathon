@@ -12,7 +12,7 @@ const MODES = [
   {
     id: 'tldr',
     icon: Lightning,
-    art: '/modes/tldr.png',
+    art: '/modes/tldr.jpeg',
     tone: 'ochre',
     title: 'TL;DR',
     description: 'Get the important stuff in seconds.',
@@ -20,7 +20,7 @@ const MODES = [
   {
     id: 'song',
     icon: MusicNotes,
-    art: '/modes/song.png',
+    art: '/modes/song.jpeg',
     tone: 'pink',
     title: 'Make a Song',
     description: 'Turn knowledge into something you can sing.',
@@ -28,7 +28,7 @@ const MODES = [
   {
     id: 'kid',
     icon: BookOpen,
-    art: '/modes/kid.png',
+    art: '/modes/kid.jpeg',
     tone: 'lavender',
     title: "Explain Like I'm 5",
     description: 'Turn complicated ideas into something kids can understand.',
