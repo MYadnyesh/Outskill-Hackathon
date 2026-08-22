@@ -71,13 +71,19 @@ export function TldrContent({ site, tldr }) {
 
       {tldr.topics?.length ? (
         <div className={styles.section}>
-          <div className={styles.sectionTitle}>Important topics</div>
-          <div className={styles.topicsRow}>
-            {tldr.topics.map((topic) => (
-              <Pill key={topic} variant="outline">
-                {topic}
-              </Pill>
-            ))}
+          <div className={styles.sectionTitle}>What it covers</div>
+          <div className={styles.topicGrid}>
+            {tldr.topics.map((topic) => {
+              // Older saved results stored topics as plain strings.
+              const name = typeof topic === 'string' ? topic : topic.name;
+              const note = typeof topic === 'string' ? '' : topic.note;
+              return (
+                <div className={styles.topicCard} key={name}>
+                  <Pill variant="outline">{name}</Pill>
+                  {note ? <p className={styles.topicNote}>{note}</p> : null}
+                </div>
+              );
+            })}
           </div>
         </div>
       ) : null}

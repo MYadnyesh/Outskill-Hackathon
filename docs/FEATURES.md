@@ -79,7 +79,9 @@ Success:  {
     url, domain, title, description, analyzedAt,
     stats: { readingTimeMinutes, headingCount, linkCount, contentType }
   },
-  tldr?: { summary, takeaways: string[], topics: string[], mainTopic },
+  tldr?: { summary, takeaways: string[],
+           topics: [{ name, note }],   // note = one sentence on what THIS page says
+           mainTopic },
   song?: { title, genre, mood, description, durationSeconds, audioUrl: string|null,
            lyrics: [{ section, lines: string[] }] },
   kid?:  { simpleExplanation, story: string[], funFacts: string[],
